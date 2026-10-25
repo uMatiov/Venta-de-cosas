@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#18181b" />
-  <meta name="description" content="Terminal Punto de Venta móvil y Panel de Costos para Dulces Migajas." />
+  <meta name="description" content="Terminal Punto de Venta móvil, Historial y Constructor de Recetas para Dulces Migajas." />
   <title>Dulces Migajas — POS</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -59,7 +59,7 @@
     body {
       max-width: 540px;
       margin: 0 auto;
-      padding-bottom: 260px;
+      padding-bottom: 265px;
     }
 
     .tabular {
@@ -168,11 +168,6 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      transition: transform 0.1s ease, background-color 0.15s ease;
-    }
-
-    .btn-ghost:active {
-      transform: scale(0.98);
     }
 
     .btn-ghost.danger {
@@ -252,11 +247,100 @@
       color: var(--success-text);
     }
 
+    /* DESGLOSE DE CAJA Y DESPLEGABLE DE HISTORIAL DE HOY */
+    .history-panel-wrap {
+      padding: 4px 16px 6px;
+    }
+
+    .cash-split-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 0.78rem;
+    }
+
+    .cash-pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .btn-toggle-history {
+      min-height: 34px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .history-drawer {
+      display: none;
+      margin-top: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .history-drawer.open {
+      display: block;
+    }
+
+    .history-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border-subtle);
+      font-size: 0.8rem;
+    }
+
+    .history-row:last-child {
+      border-bottom: none;
+    }
+
+    .history-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+
+    .btn-del-sale {
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 6px;
+      border: 1px solid #fecaca;
+      background: var(--danger-bg);
+      color: var(--danger-text);
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
     /* FILTROS */
     .filter-bar {
       display: flex;
       gap: 8px;
-      padding: 10px 16px;
+      padding: 8px 16px;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -450,13 +534,103 @@
     }
 
     .admin-card-title {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.03em;
       color: var(--text-primary);
       border-bottom: 1px solid var(--border-subtle);
       padding-bottom: 8px;
+    }
+
+    /* FORMULARIOS DEL CONSTRUCTOR DE RECETAS E INSUMOS */
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .field-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-block label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .text-input, .select-input {
+      width: 100%;
+      height: 42px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-canvas);
+      font-family: var(--font-sans);
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .ing-builder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ing-builder-row {
+      display: grid;
+      grid-template-columns: 1fr 90px 38px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .recipe-live-preview {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .btn-secondary-action {
+      min-height: 40px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border-strong);
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-primary-action {
+      min-height: 46px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--text-primary);
+      color: #ffffff;
+      font-family: var(--font-sans);
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
     }
 
     .admin-item-row {
@@ -522,11 +696,6 @@
       width: 74px;
     }
 
-    .num-input:focus {
-      outline: 2px solid var(--accent-primary);
-      background: #ffffff;
-    }
-
     .btn-save-admin {
       width: 100%;
       min-height: 52px;
@@ -539,11 +708,6 @@
       font-weight: 800;
       cursor: pointer;
       box-shadow: 0 4px 14px rgba(22, 101, 52, 0.25);
-    }
-
-    .btn-save-admin:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     /* MODAL DE CONTRASEÑA */
@@ -613,7 +777,7 @@
       border-color: var(--text-primary);
     }
 
-    /* BARRA INFERIOR DE COBRO MEJORADA */
+    /* BARRA INFERIOR DE COBRO */
     .checkout-dock {
       position: fixed;
       bottom: 0;
@@ -641,7 +805,6 @@
       gap: 8px;
     }
 
-    /* MEJORA 1: CONTRASTE NEGRO SÓLIDO EN EFECTIVO VS TRANSFERENCIA */
     .pay-toggle {
       display: flex;
       flex: 1;
@@ -663,7 +826,6 @@
       font-weight: 800;
       color: var(--text-muted);
       cursor: pointer;
-      transition: all 0.15s ease;
     }
 
     .pay-opt.active {
@@ -685,7 +847,6 @@
       cursor: pointer;
     }
 
-    /* MEJORA 2: BOTONES RÁPIDOS + INPUT DE MONTO EXACTO ($8.100) */
     .change-helper {
       display: flex;
       flex-wrap: wrap;
@@ -745,19 +906,6 @@
       text-align: right;
     }
 
-    .exact-cash-input:focus {
-      outline: 2px solid var(--accent-primary);
-      border-color: transparent;
-      background: #ffffff;
-    }
-
-    .exact-cash-input::placeholder {
-      color: var(--text-muted);
-      font-family: var(--font-sans);
-      font-weight: 600;
-      font-size: 0.74rem;
-    }
-
     .change-badge {
       font-size: 0.88rem;
       font-weight: 800;
@@ -810,13 +958,13 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <!-- MODAL DE CONTRASEÑA ADMIN -->
-  <div id="pinModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle">
+  <div id="pinModal" class="modal-backdrop" role="dialog" aria-modal="true">
     <form id="pinForm" class="modal-box">
-      <div id="pinModalTitle" class="modal-title">🔒 Acceso Administrador</div>
+      <div class="modal-title">🔒 Acceso Administrador</div>
       <p style="font-size:0.82rem; color:var(--text-secondary);">
-        Ingresa la contraseña para editar costos de insumos y precios de venta en el Excel:
+        Ingresa la contraseña para crear recetas, insumos o editar precios:
       </p>
-      <input type="password" id="pinInput" class="pin-input" placeholder="Contraseña..." autocomplete="current-password" required />
+      <input type="password" id="pinInput" class="pin-input" placeholder="Contraseña..." required />
       <div class="modal-actions">
         <button type="button" id="btnCancelPin" class="btn-modal">Cancelar</button>
         <button type="submit" id="btnConfirmPin" class="btn-modal primary">Entrar</button>
@@ -826,9 +974,7 @@
 
   <header class="app-header">
     <div class="header-top">
-      <h1 class="brand-title">
-        <span>🧁 Dulces Migajas</span>
-      </h1>
+      <h1 class="brand-title"><span>🧁 Dulces Migajas</span></h1>
       <div id="connStatus" class="status-pill">
         <span class="status-dot"></span>
         <span id="connText">En línea</span>
@@ -863,6 +1009,22 @@
       </article>
     </section>
 
+    <!-- ARQUEO DE CAJA + HISTORIAL DE VENTAS DE HOY -->
+    <section class="history-panel-wrap">
+      <div class="cash-split-bar">
+        <div class="cash-pills tabular">
+          <span>💵 Efectivo: <strong id="kpiEfectivo" style="color:var(--text-primary);">$0</strong></span>
+          <span>🏦 Transf: <strong id="kpiTransf" style="color:var(--text-primary);">$0</strong></span>
+        </div>
+        <button type="button" id="btnToggleHistory" class="btn-toggle-history">
+          📋 Historial hoy (<span id="historyCount">0</span>)
+        </button>
+      </div>
+      <div id="historyDrawer" class="history-drawer">
+        <div id="historyList"></div>
+      </div>
+    </section>
+
     <nav class="filter-bar" aria-label="Filtrar por categoría">
       <button type="button" class="tab-btn active" data-cat="TODOS">Todos</button>
       <button type="button" class="tab-btn" data-cat="Muffins">Muffins</button>
@@ -873,32 +1035,126 @@
     <section id="catalogContainer" class="catalog-section"></section>
   </main>
 
-  <!-- VISTA 2: PANEL DE ADMINISTRACIÓN PROTEGIDO -->
-  <section id="adminView" class="admin-view" aria-label="Panel de edición de costos y precios">
+  <!-- VISTA 2: PANEL DE ADMINISTRACIÓN + CONSTRUCTOR DE RECETAS E INSUMOS -->
+  <section id="adminView" class="admin-view" aria-label="Panel de administración">
     <div class="admin-banner">
       <div>
-        <h2>⚙️ Editor de Costos e Insumos</h2>
-        <p>Al guardar, el Excel recalcula Recetario, Costo Unitario y Ganancia Neta automáticamente.</p>
+        <h2>⚙️ Panel de Recetas, Insumos y Precios</h2>
+        <p>Todo lo que crees o edites aquí escribe las fórmulas directamente en tu Excel.</p>
       </div>
       <button type="button" id="btnExitAdmin" class="btn-sync-now" style="border:none;">Volver al POS</button>
     </div>
 
-    <button type="button" id="btnSaveAdminTop" class="btn-save-admin">
-      💾 Guardar cambios y recalcular Excel
-    </button>
-
+    <!-- BLOQUE NUEVO A: CONSTRUCTOR DE RECETA / PRODUCTO NUEVO -->
     <div class="admin-card">
-      <div class="admin-card-title">1. Precios de Venta y Márgenes (Catálogo)</div>
+      <div class="admin-card-title">🥣 Crear Nueva Receta y Producto</div>
+      <div class="form-grid-2">
+        <div class="field-block">
+          <label>Nombre del Producto</label>
+          <input type="text" id="recNombre" class="text-input" placeholder="Ej: Muffin Arándanos" />
+        </div>
+        <div class="field-block">
+          <label>Categoría</label>
+          <select id="recCategoria" class="select-input">
+            <option value="Muffins">Muffins</option>
+            <option value="Budines">Budines</option>
+            <option value="Combos">Combos</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid-3">
+        <div class="field-block">
+          <label>Unidades que rinde</label>
+          <input type="number" id="recUnidades" class="text-input tabular" value="15" min="1" />
+        </div>
+        <div class="field-block">
+          <label>Precio Venta ($)</label>
+          <input type="number" id="recPrecioVenta" class="text-input tabular" value="1500" step="100" min="0" />
+        </div>
+        <div class="field-block">
+          <label>Empaque ($183/u)</label>
+          <select id="recEmpaque" class="select-input">
+            <option value="SI">Incluir</option>
+            <option value="NO">Sin empaque</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label>Ingredientes del Lote (Gramos / ml / unidades que usa la receta)</label>
+        <div id="recipeIngList" class="ing-builder-list"></div>
+      </div>
+
+      <button type="button" id="btnAddIngRow" class="btn-secondary-action">
+        + Agregar otro ingrediente a la receta
+      </button>
+
+      <div id="recipePreviewBox" class="recipe-live-preview tabular">
+        <span>Costo Lote: <strong>$0</strong></span>
+        <span>Costo Unitario: <strong>$0</strong></span>
+        <span>Ganancia/u: <strong style="color:var(--success-text);">$0</strong></span>
+      </div>
+
+      <button type="button" id="btnCreateRecipe" class="btn-primary-action">
+        ✨ Crear Receta en Excel y Publicar en Catálogo
+      </button>
+    </div>
+
+    <!-- BLOQUE NUEVO B: CREADOR DE INSUMO NUEVO -->
+    <div class="admin-card">
+      <div class="admin-card-title">➕ Agregar Nuevo Insumo a la Planilla</div>
+      <div class="form-grid-2">
+        <div class="field-block">
+          <label>Nombre del Insumo</label>
+          <input type="text" id="newInsNombre" class="text-input" placeholder="Ej: Arándanos frescos" />
+        </div>
+        <div class="field-block">
+          <label>Tipo</label>
+          <select id="newInsCat" class="select-input">
+            <option value="Ingrediente">Ingrediente</option>
+            <option value="Empaque">Empaque</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid-3">
+        <div class="field-block">
+          <label>Formato Compra</label>
+          <input type="number" id="newInsCant" class="text-input tabular" placeholder="1000" value="1000" min="1" />
+        </div>
+        <div class="field-block">
+          <label>Unidad</label>
+          <select id="newInsUnidad" class="select-input">
+            <option value="g">g (gramos)</option>
+            <option value="ml">ml (líquido)</option>
+            <option value="un">un (unidades)</option>
+          </select>
+        </div>
+        <div class="field-block">
+          <label>Precio Compra ($)</label>
+          <input type="number" id="newInsPrecio" class="text-input tabular" placeholder="3500" min="0" />
+        </div>
+      </div>
+
+      <button type="button" id="btnCreateInsumo" class="btn-primary-action">
+        ➕ Guardar Nuevo Insumo en Excel
+      </button>
+    </div>
+
+    <!-- BLOQUE C: EDITAR PRECIOS E INSUMOS ACTUALES -->
+    <div class="admin-card">
+      <div class="admin-card-title">1. Editar Precios de Venta Actuales (Catálogo)</div>
       <div id="adminCatalogList"></div>
     </div>
 
     <div class="admin-card">
-      <div class="admin-card-title">2. Costo de Ingredientes y Empaque (Insumos)</div>
+      <div class="admin-card-title">2. Editar Costos de Insumos Actuales</div>
       <div id="adminInsumosList"></div>
     </div>
 
     <button type="button" id="btnSaveAdminBottom" class="btn-save-admin">
-      💾 Guardar cambios y recalcular Excel
+      💾 Guardar cambios de precios e insumos
     </button>
   </section>
 
@@ -913,7 +1169,6 @@
         <button type="button" class="btn-clear-cart" id="btnClear">Limpiar</button>
       </div>
 
-      <!-- CALCULADORA DE VUELTO: BOTONES RÁPIDOS + MONTO EXACTO -->
       <div id="changeRow" class="change-helper">
         <div class="pay-inputs-wrap">
           <div class="bill-chips">
@@ -930,7 +1185,6 @@
             placeholder="Otro $ (8100)"
             min="0"
             step="100"
-            aria-label="Escribir monto exacto con el que paga el cliente"
           />
         </div>
         <span id="changeOutput" class="change-badge tabular">Vuelto: $0</span>
@@ -975,10 +1229,11 @@
     ];
 
     const STORAGE_KEYS = {
-      CATALOG: 'dm_pos_catalog_v2',
-      INSUMOS: 'dm_pos_insumos_v2',
-      SUMMARY: 'dm_pos_summary_v2',
-      QUEUE: 'dm_pos_offline_queue_v2'
+      CATALOG: 'dm_pos_catalog_v3',
+      INSUMOS: 'dm_pos_insumos_v3',
+      SUMMARY: 'dm_pos_summary_v3',
+      HISTORY: 'dm_pos_history_v3',
+      QUEUE: 'dm_pos_offline_queue_v3'
     };
 
     let state = {
@@ -987,15 +1242,23 @@
       resumen: JSON.parse(localStorage.getItem(STORAGE_KEYS.SUMMARY)) || {
         ventasHoyBruto: 0,
         gananciaHoyNeta: 0,
-        unidadesHoy: 0
+        unidadesHoy: 0,
+        efectivoHoy: 0,
+        transferenciaHoy: 0
       },
+      ventasHoy: JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY)) || [],
       carrito: {},
       categoriaActiva: 'TODOS',
       metodoPago: 'Efectivo',
       montoPagado: 0,
       cargando: false,
       modoAdmin: false,
-      adminPin: null
+      adminPin: null,
+      recetaDraft: [
+        { idInsumo: 'INS-01', cantidad: 350 },
+        { idInsumo: 'INS-02', cantidad: 5 },
+        { idInsumo: 'INS-07', cantidad: 250 }
+      ]
     };
 
     const clpFormat = new Intl.NumberFormat('es-CL', {
@@ -1016,6 +1279,36 @@
       document.getElementById('kpiBruto').textContent = clpFormat.format(state.resumen.ventasHoyBruto || 0);
       document.getElementById('kpiNeta').textContent = clpFormat.format(state.resumen.gananciaHoyNeta || 0);
       document.getElementById('kpiUnidades').textContent = String(state.resumen.unidadesHoy || 0);
+      document.getElementById('kpiEfectivo').textContent = clpFormat.format(state.resumen.efectivoHoy || 0);
+      document.getElementById('kpiTransf').textContent = clpFormat.format(state.resumen.transferenciaHoy || 0);
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      const countEl = document.getElementById('historyCount');
+      const ventas = state.ventasHoy || [];
+      countEl.textContent = String(ventas.length);
+
+      if (!ventas.length) {
+        list.innerHTML = `<div style="text-align:center;padding:14px;color:var(--text-muted);font-size:0.8rem;">Aún no hay ventas registradas hoy.</div>`;
+        return;
+      }
+
+      list.innerHTML = ventas.map(v => `
+        <div class="history-row">
+          <div>
+            <div style="font-weight:800;">${v.cantidad}x ${v.sabor} <span class="tabular" style="color:var(--accent-primary);">(${clpFormat.format(v.totalVenta)})</span></div>
+            <div class="history-meta tabular">
+              <span>🕒 ${v.hora || '--:--'}</span>
+              <span>·</span>
+              <span>${v.metodoPago === 'Transferencia' ? '🏦 Transf' : '💵 Efectivo'}</span>
+              <span>·</span>
+              <span style="color:var(--success-text);">+${clpFormat.format(v.gananciaNeta)} neto</span>
+            </div>
+          </div>
+          <button type="button" class="btn-del-sale" data-id="${v.idVenta}" title="Anular esta venta">🗑️</button>
+        </div>
+      `).join('');
     }
 
     function renderCatalog() {
@@ -1058,7 +1351,64 @@
       }).join('');
     }
 
+    // =========================================================
+    // CONSTRUCTOR DE RECETAS EN VIVO (ADMIN)
+    // =========================================================
+    function renderRecipeBuilder() {
+      const container = document.getElementById('recipeIngList');
+      const optionsHtml = state.insumos.map(ins => {
+        const cUnit = Number(ins.costoUnitario || (ins.precioCompra / (ins.cantidadCompra || 1))).toFixed(2);
+        return `<option value="${ins.id}">${ins.nombre} ($${cUnit}/${ins.unidad})</option>`;
+      }).join('');
+
+      container.innerHTML = state.recetaDraft.map((item, idx) => `
+        <div class="ing-builder-row" data-idx="${idx}">
+          <select class="select-input draft-ing-select" data-idx="${idx}">
+            ${optionsHtml}
+          </select>
+          <input type="number" class="num-input draft-ing-qty" data-idx="${idx}" value="${item.cantidad}" min="0" step="any" placeholder="Cant." style="width:100%;" />
+          <button type="button" class="btn-del-sale draft-ing-remove" data-idx="${idx}" ${state.recetaDraft.length <= 1 ? 'disabled' : ''}>✕</button>
+        </div>
+      `).join('');
+
+      // Seleccionar valores actuales
+      container.querySelectorAll('.draft-ing-select').forEach(sel => {
+        const idx = Number(sel.dataset.idx);
+        sel.value = state.recetaDraft[idx].idInsumo;
+      });
+
+      actualizarPreviewReceta();
+    }
+
+    function actualizarPreviewReceta() {
+      const unidadesLote = Math.max(1, Number(document.getElementById('recUnidades').value) || 1);
+      const precioVenta = Math.max(0, Number(document.getElementById('recPrecioVenta').value) || 0);
+      const incEmpaque = document.getElementById('recEmpaque').value === 'SI';
+
+      let costoIngredientesLote = 0;
+      state.recetaDraft.forEach(item => {
+        const ins = state.insumos.find(i => i.id === item.idInsumo);
+        if (ins) {
+          const cUnit = Number(ins.costoUnitario || (ins.precioCompra / (ins.cantidadCompra || 1)));
+          costoIngredientesLote += (Number(item.cantidad) || 0) * cUnit;
+        }
+      });
+
+      const insEmpaque = state.insumos.find(i => i.nombre.toLowerCase().includes('empaque'));
+      const costoEmpaqueUnit = incEmpaque ? (insEmpaque ? Number(insEmpaque.costoUnitario) : 183) : 0;
+      const costoUnitarioBase = Math.round((costoIngredientesLote / unidadesLote) + costoEmpaqueUnit);
+      const gananciaUnit = precioVenta - costoUnitarioBase;
+
+      document.getElementById('recipePreviewBox').innerHTML = `
+        <span>Costo Lote: <strong>${clpFormat.format(Math.round(costoIngredientesLote))}</strong></span>
+        <span>Costo/u: <strong>${clpFormat.format(costoUnitarioBase)}</strong></span>
+        <span>Ganancia/u: <strong style="color:${gananciaUnit >= 0 ? 'var(--success-text)' : 'var(--danger-text)'};">${clpFormat.format(gananciaUnit)}</strong></span>
+      `;
+    }
+
     function renderAdminPanel() {
+      renderRecipeBuilder();
+
       const catList = document.getElementById('adminCatalogList');
       const insList = document.getElementById('adminInsumosList');
 
@@ -1180,6 +1530,10 @@
         state.resumen = data.resumen;
         localStorage.setItem(STORAGE_KEYS.SUMMARY, JSON.stringify(data.resumen));
       }
+      if (Array.isArray(data.ventasHoy)) {
+        state.ventasHoy = data.ventasHoy;
+        localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(data.ventasHoy));
+      }
     }
 
     async function sincronizarDesdeExcel(silencioso = false) {
@@ -1194,8 +1548,9 @@
           guardarEstadoLocal(data);
           actualizarEstadoConexion(true);
           renderMetrics();
+          renderHistory();
           renderCatalog();
-          renderAdminPanel();
+          if (state.modoAdmin) renderAdminPanel();
           renderCheckoutBar();
           if (!silencioso) showToast('✓ Sincronizado con Google Sheets');
         }
@@ -1208,7 +1563,7 @@
     }
 
     // =========================================================
-    // FLUJO DE ADMINISTRACIÓN CON CONTRASEÑA
+    // FLUJO DE ADMINISTRACIÓN, NUEVO INSUMO Y NUEVA RECETA
     // =========================================================
     function toggleVistaAdmin(mostrar) {
       state.modoAdmin = mostrar;
@@ -1273,14 +1628,149 @@
       }
     });
 
+    // Eventos del Constructor de Recetas
+    document.getElementById('btnAddIngRow').addEventListener('click', () => {
+      const primerId = state.insumos[0] ? state.insumos[0].id : 'INS-01';
+      state.recetaDraft.push({ idInsumo: primerId, cantidad: 50 });
+      renderRecipeBuilder();
+    });
+
+    document.getElementById('recipeIngList').addEventListener('change', (e) => {
+      const idx = Number(e.target.dataset.idx);
+      if (e.target.classList.contains('draft-ing-select')) {
+        state.recetaDraft[idx].idInsumo = e.target.value;
+        actualizarPreviewReceta();
+      }
+    });
+
+    document.getElementById('recipeIngList').addEventListener('input', (e) => {
+      const idx = Number(e.target.dataset.idx);
+      if (e.target.classList.contains('draft-ing-qty')) {
+        state.recetaDraft[idx].cantidad = Number(e.target.value) || 0;
+        actualizarPreviewReceta();
+      }
+    });
+
+    document.getElementById('recipeIngList').addEventListener('click', (e) => {
+      const btn = e.target.closest('.draft-ing-remove');
+      if (!btn || state.recetaDraft.length <= 1) return;
+      const idx = Number(btn.dataset.idx);
+      state.recetaDraft.splice(idx, 1);
+      renderRecipeBuilder();
+    });
+
+    ['recUnidades', 'recPrecioVenta', 'recEmpaque'].forEach(id => {
+      document.getElementById(id).addEventListener('input', actualizarPreviewReceta);
+      document.getElementById(id).addEventListener('change', actualizarPreviewReceta);
+    });
+
+    // Crear Nueva Receta en Excel
+    document.getElementById('btnCreateRecipe').addEventListener('click', async () => {
+      const nombre = document.getElementById('recNombre').value.trim();
+      const categoria = document.getElementById('recCategoria').value;
+      const unidadesLote = Number(document.getElementById('recUnidades').value) || 1;
+      const precioVenta = Number(document.getElementById('recPrecioVenta').value) || 0;
+      const incluyeEmpaque = document.getElementById('recEmpaque').value === 'SI';
+
+      if (!nombre) {
+        showToast('Escribe un nombre para el nuevo producto');
+        return;
+      }
+
+      const btn = document.getElementById('btnCreateRecipe');
+      btn.disabled = true;
+      btn.textContent = '⏳ Escribiendo fórmula en Recetario y Catálogo...';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            accion: 'crear_receta',
+            pin: state.adminPin,
+            nombre,
+            categoria,
+            unidadesLote,
+            precioVenta,
+            incluyeEmpaque,
+            ingredientes: state.recetaDraft
+          })
+        });
+        const data = await res.json();
+        if (data && data.ok) {
+          guardarEstadoLocal(data);
+          document.getElementById('recNombre').value = '';
+          renderCatalog();
+          renderAdminPanel();
+          showToast('✓ ' + (data.mensaje || 'Receta creada en Excel'));
+        } else {
+          showToast('❌ ' + (data.error || 'No se pudo crear la receta'));
+        }
+      } catch (err) {
+        showToast('Error de red al crear la receta');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✨ Crear Receta en Excel y Publicar en Catálogo';
+      }
+    });
+
+    // Crear Nuevo Insumo en Excel
+    document.getElementById('btnCreateInsumo').addEventListener('click', async () => {
+      const nombre = document.getElementById('newInsNombre').value.trim();
+      const categoria = document.getElementById('newInsCat').value;
+      const cantidadCompra = Number(document.getElementById('newInsCant').value) || 1000;
+      const unidad = document.getElementById('newInsUnidad').value;
+      const precioCompra = Number(document.getElementById('newInsPrecio').value) || 0;
+
+      if (!nombre) {
+        showToast('Escribe el nombre del nuevo insumo');
+        return;
+      }
+
+      const btn = document.getElementById('btnCreateInsumo');
+      btn.disabled = true;
+      btn.textContent = '⏳ Guardando insumo en Excel...';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            accion: 'crear_insumo',
+            pin: state.adminPin,
+            nombre,
+            categoria,
+            cantidadCompra,
+            unidad,
+            precioCompra
+          })
+        });
+        const data = await res.json();
+        if (data && data.ok) {
+          guardarEstadoLocal(data);
+          document.getElementById('newInsNombre').value = '';
+          document.getElementById('newInsPrecio').value = '';
+          renderAdminPanel();
+          showToast('✓ ' + (data.mensaje || 'Insumo agregado'));
+        } else {
+          showToast('❌ ' + (data.error || 'Error al crear insumo'));
+        }
+      } catch (err) {
+        showToast('Error de conexión al guardar insumo');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '➕ Guardar Nuevo Insumo en Excel';
+      }
+    });
+
+    // Guardar edición de precios e insumos existentes
     async function guardarCambiosAdmin() {
       if (!state.adminPin) return;
 
-      const btnTop = document.getElementById('btnSaveAdminTop');
       const btnBot = document.getElementById('btnSaveAdminBottom');
-      btnTop.disabled = true;
       btnBot.disabled = true;
-      btnTop.textContent = '⏳ Recalculando en Excel...';
       btnBot.textContent = '⏳ Recalculando en Excel...';
 
       const precios = Array.from(document.querySelectorAll('.admin-price-input')).map(input => ({
@@ -1324,38 +1814,85 @@
       } catch (err) {
         showToast('Error de red al guardar en Excel');
       } finally {
-        btnTop.disabled = false;
         btnBot.disabled = false;
-        btnTop.textContent = '💾 Guardar cambios y recalcular Excel';
-        btnBot.textContent = '💾 Guardar cambios y recalcular Excel';
+        btnBot.textContent = '💾 Guardar cambios de precios e insumos';
       }
     }
 
-    document.getElementById('btnSaveAdminTop').addEventListener('click', guardarCambiosAdmin);
     document.getElementById('btnSaveAdminBottom').addEventListener('click', guardarCambiosAdmin);
 
     // =========================================================
-    // REGISTRO DE VENTAS Y COLA OFFLINE
+    // REGISTRO DE VENTAS, HISTORIAL Y ANULACIÓN POR ID
     // =========================================================
+    document.getElementById('btnToggleHistory').addEventListener('click', () => {
+      document.getElementById('historyDrawer').classList.toggle('open');
+    });
+
+    document.getElementById('historyList').addEventListener('click', async (e) => {
+      const btn = e.target.closest('.btn-del-sale');
+      if (!btn) return;
+      const idVenta = btn.dataset.id;
+      if (!confirm('¿Eliminar esta venta específica del Excel?')) return;
+
+      btn.textContent = '...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ accion: 'borrar_venta_id', idVenta })
+        });
+        const data = await res.json();
+        if (data && data.ok) {
+          guardarEstadoLocal(data);
+          renderMetrics();
+          renderHistory();
+          showToast('🗑️ Venta eliminada del registro');
+        } else {
+          showToast(data.error || 'No se pudo borrar');
+        }
+      } catch (err) {
+        showToast('Error de red al intentar borrar');
+      }
+    });
+
     async function registrarVenta() {
       const { totalUnidades, totalMonto, totalGanancia } = calcularTotalesCarrito();
       if (totalUnidades === 0 || state.cargando) return;
 
       const timestamp = Date.now();
+      const ahora = new Date();
+      const horaActual = String(ahora.getHours()).padStart(2, '0') + ':' + String(ahora.getMinutes()).padStart(2, '0');
       const items = [];
 
       for (const [sku, cantidad] of Object.entries(state.carrito)) {
         if (cantidad > 0) {
           const prod = state.catalogo.find(p => p.sku === sku);
           if (prod) {
+            const idVenta = `V-${timestamp}-${sku}`;
             items.push({
-              idVenta: `V-${timestamp}-${sku}`,
+              idVenta,
               sku: prod.sku,
               categoria: prod.categoria,
               sabor: prod.sabor,
               cantidad: cantidad,
               precioUnitario: prod.precioVenta,
               costoUnitario: prod.costoUnitario
+            });
+
+            // Agregar al historial optimista en vivo
+            state.ventasHoy.unshift({
+              idVenta,
+              hora: horaActual,
+              sku: prod.sku,
+              categoria: prod.categoria,
+              sabor: prod.sabor,
+              cantidad: cantidad,
+              totalVenta: cantidad * prod.precioVenta,
+              gananciaNeta: cantidad * prod.gananciaNeta,
+              metodoPago: state.metodoPago
             });
           }
         }
@@ -1368,11 +1905,19 @@
       state.resumen.ventasHoyBruto = (state.resumen.ventasHoyBruto || 0) + totalMonto;
       state.resumen.gananciaHoyNeta = (state.resumen.gananciaHoyNeta || 0) + totalGanancia;
       state.resumen.unidadesHoy = (state.resumen.unidadesHoy || 0) + totalUnidades;
+      if (state.metodoPago === 'Transferencia') {
+        state.resumen.transferenciaHoy = (state.resumen.transferenciaHoy || 0) + totalMonto;
+      } else {
+        state.resumen.efectivoHoy = (state.resumen.efectivoHoy || 0) + totalMonto;
+      }
+
       localStorage.setItem(STORAGE_KEYS.SUMMARY, JSON.stringify(state.resumen));
+      localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(state.ventasHoy));
 
       state.carrito = {};
       limpiarMontoPagado();
       renderMetrics();
+      renderHistory();
       renderCatalog();
 
       try {
@@ -1384,9 +1929,11 @@
         });
         const result = await response.json();
         if (result && result.ok) {
+          guardarEstadoLocal(result);
           actualizarEstadoConexion(true);
+          renderMetrics();
+          renderHistory();
           showToast(`✓ Venta anotada (${clpFormat.format(totalMonto)})`);
-          sincronizarDesdeExcel(true);
         } else {
           throw new Error(result.error || 'Error');
         }
@@ -1416,8 +1963,10 @@
         });
         const result = await response.json();
         if (result && result.ok) {
+          guardarEstadoLocal(result);
+          renderMetrics();
+          renderHistory();
           showToast('⌫ Última venta eliminada');
-          await sincronizarDesdeExcel(true);
         } else {
           showToast(result.error || 'No se pudo borrar');
         }
@@ -1472,9 +2021,7 @@
       text.textContent = online ? 'En línea' : 'Offline';
     }
 
-    // =========================================================
-    // EVENTOS DE INTERFAZ Y CALCULADORA DE VUELTO
-    // =========================================================
+    // EVENTOS DEL POS
     document.getElementById('catalogContainer').addEventListener('click', (e) => {
       const btn = e.target.closest('.step-btn');
       if (!btn) return;
@@ -1507,7 +2054,6 @@
       document.getElementById('changeRow').style.display = state.metodoPago === 'Efectivo' ? 'flex' : 'none';
     });
 
-    // Selección de billetes rápidos ($2k, $5k, $10k, $20k)
     document.querySelector('.bill-chips').addEventListener('click', (e) => {
       const chip = e.target.closest('.bill-chip');
       if (!chip) return;
@@ -1527,7 +2073,6 @@
       renderCheckoutBar();
     });
 
-    // Escritura manual de monto exacto (ej. 8100)
     document.getElementById('customCashInput').addEventListener('input', (e) => {
       const val = Number(e.target.value) || 0;
       state.montoPagado = val;
@@ -1551,6 +2096,7 @@
     window.addEventListener('online', vaciarColaOffline);
 
     renderMetrics();
+    renderHistory();
     renderCatalog();
     renderCheckoutBar();
     renderQueueBanner();
