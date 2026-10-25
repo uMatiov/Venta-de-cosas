@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#18181b" />
+  <meta name="description" content="Terminal Punto de Venta móvil para Dulces Migajas conectado a Google Sheets." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Dulces Migajas — POS</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-canvas: #f6f4f0;
+      --bg-surface: #ffffff;
+      --bg-elevated: #ede9e1;
+      --text-primary: #18181b;
+      --text-secondary: #52525b;
+      --text-muted: #71717a;
+      --border-subtle: #e4e0d8;
+      --border-strong: #18181b;
+      --accent-primary: #9a3412;
+      --accent-primary-hover: #7c2d12;
+      --accent-soft: #ffedd5;
+      --budin-tag-bg: #fef3c7;
+      --budin-tag-text: #92400e;
+      --muffin-tag-bg: #ede9fe;
+      --muffin-tag-text: #5b21b6;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --warn-bg: #fef9c3;
+      --warn-text: #854d0e;
+      --danger-bg: #fee2e2;
+      --danger-text: #991b1b;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.4;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    body {
+      max-width: 540px;
+      margin: 0 auto;
+      padding-bottom: 240px;
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-mono);
+    }
+
+    /* HEADER & STATUS */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(246, 244, 240, 0.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 16px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .brand-title {
+      font-size: clamp(1.1rem, 4vw, 1.25rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--success-bg);
+      color: var(--success-text);
+      border: 1px solid rgba(22, 101, 52, 0.2);
+    }
+
+    .status-pill.offline {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      border-color: rgba(133, 77, 14, 0.25);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-ghost {
+      flex: 1;
+      min-height: 40px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+
+    .btn-ghost:active {
+      transform: scale(0.98);
+      background: var(--bg-elevated);
+    }
+
+    .btn-ghost.danger {
+      color: var(--danger-text);
+      border-color: #fecaca;
+    }
+
+    /* OFFLINE QUEUE BANNER */
+    .queue-banner {
+      display: none;
+      margin: 12px 16px 0;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      border: 1px solid #fde047;
+      font-size: 0.82rem;
+      font-weight: 600;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .queue-banner.visible {
+      display: flex;
+    }
+
+    .btn-sync-now {
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--warn-text);
+      background: #ffffff;
+      color: var(--warn-text);
+      font-weight: 800;
+      font-size: 0.78rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* KPI METRICS STRIP */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding: 14px 16px 6px;
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      min-width: 0;
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .metric-value {
+      font-size: clamp(1rem, 3.8vw, 1.2rem);
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--text-primary);
+    }
+
+    .metric-value.profit {
+      color: var(--success-text);
+    }
+
+    /* CATEGORY FILTER TABS */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      min-height: 44px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--text-primary);
+      color: #ffffff;
+      border-color: var(--text-primary);
+    }
+
+    /* PRODUCT LIST */
+    .catalog-section {
+      padding: 4px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .product-row {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .product-row.selected {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 1px var(--accent-primary);
+      background: #fffaf5;
+    }
+
+    .product-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .product-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .cat-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .cat-badge.budines {
+      background: var(--budin-tag-bg);
+      color: var(--budin-tag-text);
+    }
+
+    .cat-badge.muffins {
+      background: var(--muffin-tag-bg);
+      color: var(--muffin-tag-text);
+    }
+
+    .sku-code {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .product-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-price-line {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .product-price {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+
+    .product-profit-hint {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    /* STEPPER CONTROLS (48x48px touch targets) */
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .step-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-size: 1.3rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transition: transform 0.08s ease, background-color 0.12s ease;
+    }
+
+    .step-btn.plus {
+      background: var(--text-primary);
+      color: #ffffff;
+      border-color: var(--text-primary);
+    }
+
+    .step-btn:active {
+      transform: scale(0.92);
+    }
+
+    .step-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .qty-display {
+      min-width: 30px;
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    /* STICKY CHECKOUT BAR */
+    .checkout-dock {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      background: var(--bg-surface);
+      border-top: 2px solid var(--border-strong);
+      padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+      box-shadow: 0 -8px 24px rgba(24, 24, 27, 0.08);
+    }
+
+    .checkout-inner {
+      max-width: 540px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .payment-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pay-toggle {
+      display: flex;
+      flex: 1;
+      background: var(--bg-canvas);
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .pay-opt {
+      flex: 1;
+      min-height: 38px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .pay-opt.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .btn-clear-cart {
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-canvas);
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* QUICK CHANGE CALCULATOR */
+    .change-helper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      background: var(--bg-canvas);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .bill-chips {
+      display: flex;
+      gap: 4px;
+    }
+
+    .bill-chip {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .bill-chip.active {
+      background: var(--accent-soft);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .submit-btn {
+      width: 100%;
+      min-height: 54px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--accent-primary);
+      color: #ffffff;
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.08s ease;
+    }
+
+    .submit-btn:hover {
+      background: var(--accent-primary-hover);
+    }
+
+    .submit-btn:active {
+      transform: scale(0.99);
+    }
+
+    .submit-btn:disabled {
+      background: #d4d0c8;
+      color: #71717a;
+      cursor: not-allowed;
+    }
+
+    /* TOAST FEEDBACK */
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120%);
+      z-index: 60;
+      background: var(--text-primary);
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+      max-width: 92vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 20px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <header class="app-header">
+    <div class="header-top">
+      <h1 class="brand-title">
+        <span>🧁 Dulces Migajas</span>
+      </h1>
+      <div id="connStatus" class="status-pill">
+        <span class="status-dot"></span>
+        <span id="connText">Conectado</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-ghost" id="btnRefresh" aria-label="Sincronizar catálogo y resumen">
+        ↻ Actualizar Excel
+      </button>
+      <button type="button" class="btn-ghost danger" id="btnUndo" aria-label="Deshacer última venta">
+        ⌫ Deshacer última
+      </button>
+    </div>
+  </header>
+
+  <!-- Cola Offline por si falla la señal -->
+  <div id="queueBanner" class="queue-banner">
+    <span id="queueText">Tienes ventas pendientes por subir</span>
+    <button type="button" class="btn-sync-now" id="btnSyncQueue">Subir ahora</button>
+  </div>
+
+  <main>
+    <!-- Tarjetas de Resumen en vivo desde la hoja Resumen -->
+    <section class="metrics-grid" aria-label="Resumen de ventas del día">
+      <article class="metric-card">
+        <div class="metric-label">Ventas Hoy</div>
+        <div id="kpiBruto" class="metric-value tabular">$0</div>
+      </article>
+      <article class="metric-card">
+        <div class="metric-label">Ganancia Hoy</div>
+        <div id="kpiNeta" class="metric-value profit tabular">$0</div>
+      </article>
+      <article class="metric-card">
+        <div class="metric-label">Unidades Hoy</div>
+        <div id="kpiUnidades" class="metric-value tabular">0</div>
+      </article>
+    </section>
+
+    <!-- Filtros por Categoría -->
+    <nav class="filter-bar" aria-label="Filtrar por categoría">
+      <button type="button" class="tab-btn active" data-cat="TODOS">Todos</button>
+      <button type="button" class="tab-btn" data-cat="Muffins">Muffins ($1.500)</button>
+      <button type="button" class="tab-btn" data-cat="Budines">Budines ($4.500)</button>
+    </nav>
+
+    <!-- Lista de Productos -->
+    <section id="catalogContainer" class="catalog-section" aria-label="Catálogo de productos"></section>
+  </main>
+
+  <!-- Barra Inferior Fija de Cobro -->
+  <footer class="checkout-dock">
+    <div class="checkout-inner">
+      <div class="payment-row">
+        <div class="pay-toggle" role="group" aria-label="Método de pago">
+          <button type="button" class="pay-opt active" data-pay="Efectivo">💵 Efectivo</button>
+          <button type="button" class="pay-opt" data-pay="Transferencia">🏦 Transferencia</button>
+        </div>
+        <button type="button" class="btn-clear-cart" id="btnClear">Limpiar</button>
+      </div>
+
+      <div id="changeRow" class="change-helper">
+        <span>Paga con:</span>
+        <div class="bill-chips">
+          <button type="button" class="bill-chip" data-bill="2000">$2k</button>
+          <button type="button" class="bill-chip" data-bill="5000">$5k</button>
+          <button type="button" class="bill-chip" data-bill="10000">$10k</button>
+          <button type="button" class="bill-chip" data-bill="20000">$20k</button>
+        </div>
+        <span id="changeOutput" class="tabular" style="font-weight:700;">Vuelto: $0</span>
+      </div>
+
+      <button type="button" id="btnSubmit" class="submit-btn" disabled>
+        <span id="submitLabel">Selecciona productos</span>
+        <span id="submitTotal" class="tabular">$0</span>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    // =========================================================
+    // CONFIGURACIÓN CON TU URL DE GOOGLE APPS SCRIPT
+    // =========================================================
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyotaJufuix2wAC6VRtz5uuxKI_cDeLVEnvnpj0tG3wjsD4G8rD05x1vd4u2Sb_y-m9Ig/exec';
+
+    // Catálogo de respaldo instantáneo (idéntico a tu pestaña Catalogo)
+    const FALLBACK_CATALOG = [
+      { sku: 'MUF-MAR', categoria: 'Muffins', sabor: 'Muffin marmolado', costoUnitario: 410, precioVenta: 1500, gananciaNeta: 1090 },
+      { sku: 'MUF-CHI', categoria: 'Muffins', sabor: 'Muffin chispitas', costoUnitario: 423, precioVenta: 1500, gananciaNeta: 1077 },
+      { sku: 'MUF-BOR', categoria: 'Muffins', sabor: 'Muffin borrachito', costoUnitario: 398, precioVenta: 1500, gananciaNeta: 1102 },
+      { sku: 'BUD-BAN', categoria: 'Budines', sabor: 'Budin de banana', costoUnitario: 906, precioVenta: 4500, gananciaNeta: 3594 },
+      { sku: 'BUD-CHO', categoria: 'Budines', sabor: 'Budin de chocolate', costoUnitario: 1033, precioVenta: 4500, gananciaNeta: 3467 },
+      { sku: 'BUD-CHI', categoria: 'Budines', sabor: 'Budin de chips y nueces', costoUnitario: 2106, precioVenta: 4500, gananciaNeta: 2394 }
+    ];
+
+    const STORAGE_KEYS = {
+      CATALOG: 'dm_pos_catalog_v1',
+      SUMMARY: 'dm_pos_summary_v1',
+      QUEUE: 'dm_pos_offline_queue_v1'
+    };
+
+    let state = {
+      catalogo: JSON.parse(localStorage.getItem(STORAGE_KEYS.CATALOG)) || FALLBACK_CATALOG,
+      resumen: JSON.parse(localStorage.getItem(STORAGE_KEYS.SUMMARY)) || {
+        ventasHoyBruto: 0,
+        gananciaHoyNeta: 0,
+        unidadesHoy: 0
+      },
+      carrito: {},
+      categoriaActiva: 'TODOS',
+      metodoPago: 'Efectivo',
+      billeteSeleccionado: 0,
+      cargando: false
+    };
+
+    const clpFormat = new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      maximumFractionDigits: 0
+    });
+
+    // =========================================================
+    // RENDERIZADO DE INTERFAZ
+    // =========================================================
+    function renderMetrics() {
+      document.getElementById('kpiBruto').textContent = clpFormat.format(state.resumen.ventasHoyBruto || 0);
+      document.getElementById('kpiNeta').textContent = clpFormat.format(state.resumen.gananciaHoyNeta || 0);
+      document.getElementById('kpiUnidades').textContent = String(state.resumen.unidadesHoy || 0);
+    }
+
+    function renderCatalog() {
+      const container = document.getElementById('catalogContainer');
+      const filtrados = state.categoriaActiva === 'TODOS'
+        ? state.catalogo
+        : state.catalogo.filter(p => p.categoria.toLowerCase() === state.categoriaActiva.toLowerCase());
+
+      if (!filtrados.length) {
+        container.innerHTML = `<div class="empty-state">No hay productos activos en esta categoría.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtrados.map(prod => {
+        const qty = state.carrito[prod.sku] || 0;
+        const isBudin = prod.categoria.toLowerCase().includes('budin');
+        const badgeClass = isBudin ? 'budines' : 'muffins';
+
+        return `
+          <article class="product-row ${qty > 0 ? 'selected' : ''}" data-sku="${prod.sku}">
+            <div class="product-info">
+              <div class="product-badges">
+                <span class="cat-badge ${badgeClass}">${prod.categoria}</span>
+                <span class="sku-code tabular">${prod.sku}</span>
+              </div>
+              <div class="product-name">${prod.sabor}</div>
+              <div class="product-price-line">
+                <span class="product-price tabular">${clpFormat.format(prod.precioVenta)}</span>
+                <span class="product-profit-hint tabular">(+${clpFormat.format(prod.gananciaNeta)} neto)</span>
+              </div>
+            </div>
+            <div class="stepper">
+              <button type="button" class="step-btn minus" data-action="minus" data-sku="${prod.sku}" ${qty === 0 ? 'disabled' : ''} aria-label="Restar ${prod.sabor}">−</button>
+              <span class="qty-display tabular">${qty}</span>
+              <button type="button" class="step-btn plus" data-action="plus" data-sku="${prod.sku}" aria-label="Sumar ${prod.sabor}">+</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function calcularTotalesCarrito() {
+      let totalUnidades = 0;
+      let totalMonto = 0;
+      let totalGanancia = 0;
+
+      for (const [sku, qty] of Object.entries(state.carrito)) {
+        if (qty > 0) {
+          const prod = state.catalogo.find(p => p.sku === sku);
+          if (prod) {
+            totalUnidades += qty;
+            totalMonto += qty * prod.precioVenta;
+            totalGanancia += qty * prod.gananciaNeta;
+          }
+        }
+      }
+      return { totalUnidades, totalMonto, totalGanancia };
+    }
+
+    function renderCheckoutBar() {
+      const { totalUnidades, totalMonto } = calcularTotalesCarrito();
+      const btnSubmit = document.getElementById('btnSubmit');
+      const submitLabel = document.getElementById('submitLabel');
+      const submitTotal = document.getElementById('submitTotal');
+      const changeOutput = document.getElementById('changeOutput');
+
+      submitTotal.textContent = clpFormat.format(totalMonto);
+
+      if (totalUnidades === 0) {
+        btnSubmit.disabled = true;
+        submitLabel.textContent = 'Selecciona productos';
+      } else {
+        btnSubmit.disabled = state.cargando;
+        submitLabel.textContent = state.cargando
+          ? 'Guardando en Excel...'
+          : `Anote ${totalUnidades} ${totalUnidades === 1 ? 'unidad' : 'unidades'} →`;
+      }
+
+      if (state.billeteSeleccionado > 0 && totalMonto > 0) {
+        const vuelto = state.billeteSeleccionado - totalMonto;
+        changeOutput.textContent = vuelto >= 0
+          ? `Vuelto: ${clpFormat.format(vuelto)}`
+          : `Faltan: ${clpFormat.format(Math.abs(vuelto))}`;
+      } else {
+        changeOutput.textContent = 'Vuelto: $0';
+      }
+    }
+
+    function renderQueueBanner() {
+      const queue = obtenerColaOffline();
+      const banner = document.getElementById('queueBanner');
+      const text = document.getElementById('queueText');
+
+      if (queue.length > 0) {
+        banner.classList.add('visible');
+        text.textContent = `${queue.length} ${queue.length === 1 ? 'venta pendiente' : 'ventas pendientes'} de subir al Excel`;
+      } else {
+        banner.classList.remove('visible');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // =========================================================
+    // SINCRONIZACIÓN CON GOOGLE SHEETS (GET & POST)
+    // =========================================================
+    async function sincronizarDesdeExcel(silencioso = false) {
+      const btnRefresh = document.getElementById('btnRefresh');
+      if (!silencioso) btnRefresh.textContent = '↻ Cargando...';
+
+      try {
+        const res = await fetch(API_URL + '?t=' + Date.now(), { method: 'GET', redirect: 'follow' });
+        const data = await res.json();
+
+        if (data && data.ok) {
+          if (Array.isArray(data.catalogo) && data.catalogo.length > 0) {
+            state.catalogo = data.catalogo;
+            localStorage.setItem(STORAGE_KEYS.CATALOG, JSON.stringify(data.catalogo));
+          }
+          if (data.resumen) {
+            state.resumen = data.resumen;
+            localStorage.setItem(STORAGE_KEYS.SUMMARY, JSON.stringify(data.resumen));
+          }
+          actualizarEstadoConexion(true);
+          renderMetrics();
+          renderCatalog();
+          renderCheckoutBar();
+          if (!silencioso) showToast('✓ Sincronizado con Google Sheets');
+        }
+      } catch (err) {
+        actualizarEstadoConexion(false);
+        if (!silencioso) showToast('Modo Offline: usando catálogo guardado');
+      } finally {
+        btnRefresh.textContent = '↻ Actualizar Excel';
+      }
+    }
+
+    async function registrarVenta() {
+      const { totalUnidades, totalMonto, totalGanancia } = calcularTotalesCarrito();
+      if (totalUnidades === 0 || state.cargando) return;
+
+      const timestamp = Date.now();
+      const items = [];
+
+      for (const [sku, cantidad] of Object.entries(state.carrito)) {
+        if (cantidad > 0) {
+          const prod = state.catalogo.find(p => p.sku === sku);
+          if (prod) {
+            items.push({
+              idVenta: `V-${timestamp}-${sku}`,
+              sku: prod.sku,
+              categoria: prod.categoria,
+              sabor: prod.sabor,
+              cantidad: cantidad,
+              precioUnitario: prod.precioVenta,
+              costoUnitario: prod.costoUnitario
+            });
+          }
+        }
+      }
+
+      const payload = {
+        accion: 'venta',
+        metodoPago: state.metodoPago,
+        items: items
+      };
+
+      state.cargando = true;
+      renderCheckoutBar();
+
+      // Actualización optimista inmediata en pantalla
+      state.resumen.ventasHoyBruto = (state.resumen.ventasHoyBruto || 0) + totalMonto;
+      state.resumen.gananciaHoyNeta = (state.resumen.gananciaHoyNeta || 0) + totalGanancia;
+      state.resumen.unidadesHoy = (state.resumen.unidadesHoy || 0) + totalUnidades;
+      localStorage.setItem(STORAGE_KEYS.SUMMARY, JSON.stringify(state.resumen));
+
+      state.carrito = {};
+      state.billeteSeleccionado = 0;
+      document.querySelectorAll('.bill-chip').forEach(b => b.classList.remove('active'));
+      renderMetrics();
+      renderCatalog();
+
+      try {
+        // text/plain evita el bloqueo CORS preflight (OPTIONS) en Google Apps Script
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (result && result.ok) {
+          actualizarEstadoConexion(true);
+          showToast(`✓ Venta anotada (${clpFormat.format(totalMonto)})`);
+          sincronizarDesdeExcel(true);
+        } else {
+          throw new Error(result.error || 'Respuesta inválida');
+        }
+      } catch (err) {
+        actualizarEstadoConexion(false);
+        guardarEnColaOffline(payload);
+        showToast('Sin señal: Venta guardada en cola offline');
+      } finally {
+        state.cargando = false;
+        renderCheckoutBar();
+      }
+    }
+
+    async function deshacerUltimaVenta() {
+      if (!confirm('¿Borrar la última fila registrada en la pestaña Ventas del Excel?')) return;
+
+      const btnUndo = document.getElementById('btnUndo');
+      btnUndo.textContent = 'Borrando...';
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ accion: 'deshacer' })
+        });
+        const result = await response.json();
+
+        if (result && result.ok) {
+          showToast('⌫ Última venta eliminada del Excel');
+          await sincronizarDesdeExcel(true);
+        } else {
+          showToast(result.error || 'No se pudo borrar');
+        }
+      } catch (err) {
+        showToast('Necesitas conexión para deshacer en el Excel');
+      } finally {
+        btnUndo.textContent = '⌫ Deshacer última';
+      }
+    }
+
+    // =========================================================
+    // COLA OFFLINE (RESILIENCIA SURGICAL-BOT-OPS)
+    // =========================================================
+    function obtenerColaOffline() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.QUEUE)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function guardarEnColaOffline(payload) {
+      const queue = obtenerColaOffline();
+      queue.push(payload);
+      localStorage.setItem(STORAGE_KEYS.QUEUE, JSON.stringify(queue));
+      renderQueueBanner();
+    }
+
+    async function VaciarColaOffline() {
+      const queue = obtenerColaOffline();
+      if (queue.length === 0) return;
+
+      const btnSync = document.getElementById('btnSyncQueue');
+      btnSync.textContent = 'Subiendo...';
+
+      const pendientes = [];
+      for (const pedido of queue) {
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(pedido)
+          });
+          const data = await res.json();
+          if (!data || !data.ok) pendientes.push(pedido);
+        } catch {
+          pendientes.push(pedido);
+        }
+      }
+
+      localStorage.setItem(STORAGE_KEYS.QUEUE, JSON.stringify(pendientes));
+      renderQueueBanner();
+      btnSync.textContent = 'Subir ahora';
+
+      if (pendientes.length === 0) {
+        actualizarEstadoConexion(true);
+        showToast('✓ Todas las ventas pendientes fueron subidas');
+        sincronizarDesdeExcel(true);
+      } else {
+        showToast(`Quedaron ${pendientes.length} pendientes por señal`);
+      }
+    }
+
+    function actualizarEstadoConexion(online) {
+      const pill = document.getElementById('connStatus');
+      const text = document.getElementById('connText');
+      if (online) {
+        pill.classList.remove('offline');
+        text.textContent = 'En línea';
+      } else {
+        pill.classList.add('offline');
+        text.textContent = 'Offline';
+      }
+    }
+
+    // =========================================================
+    // EVENTOS TÁCTILES (DELEGACIÓN)
+    // =========================================================
+    document.getElementById('catalogContainer').addEventListener('click', (e) => {
+      const btn = e.target.closest('.step-btn');
+      if (!btn) return;
+
+      const sku = btn.dataset.sku;
+      const action = btn.dataset.action;
+      const actual = state.carrito[sku] || 0;
+
+      if (action === 'plus') {
+        state.carrito[sku] = actual + 1;
+      } else if (action === 'minus' && actual > 0) {
+        state.carrito[sku] = actual - 1;
+        if (state.carrito[sku] === 0) delete state.carrito[sku];
+      }
+
+      renderCatalog();
+      renderCheckoutBar();
+    });
+
+    document.querySelector('.filter-bar').addEventListener('click', (e) => {
+      const tab = e.target.closest('.tab-btn');
+      if (!tab) return;
+
+      document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.categoriaActiva = tab.dataset.cat;
+      renderCatalog();
+    });
+
+    document.querySelector('.pay-toggle').addEventListener('click', (e) => {
+      const opt = e.target.closest('.pay-opt');
+      if (!opt) return;
+
+      document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      state.metodoPago = opt.dataset.pay;
+
+      document.getElementById('changeRow').style.display =
+        state.metodoPago === 'Efectivo' ? 'flex' : 'none';
+    });
+
+    document.querySelector('.bill-chips').addEventListener('click', (e) => {
+      const chip = e.target.closest('.bill-chip');
+      if (!chip) return;
+
+      const val = Number(chip.dataset.bill);
+      if (state.billeteSeleccionado === val) {
+        state.billeteSeleccionado = 0;
+        chip.classList.remove('active');
+      } else {
+        document.querySelectorAll('.bill-chip').forEach(c => c.classList.remove('active'));
+        state.billeteSeleccionado = val;
+        chip.classList.add('active');
+      }
+      renderCheckoutBar();
+    });
+
+    document.getElementById('btnClear').addEventListener('click', () => {
+      state.carrito = {};
+      state.billeteSeleccionado = 0;
+      document.querySelectorAll('.bill-chip').forEach(c => c.classList.remove('active'));
+      renderCatalog();
+      renderCheckoutBar();
+    });
+
+    document.getElementById('btnSubmit').addEventListener('click', registrarVenta);
+    document.getElementById('btnRefresh').addEventListener('click', () => sincronizarDesdeExcel(false));
+    document.getElementById('btnUndo').addEventListener('click', deshacerUltimaVenta);
+    document.getElementById('btnSyncQueue').addEventListener('click', VaciarColaOffline);
+    window.addEventListener('online', VaciarColaOffline);
+
+    // Inicialización inmediata
+    renderMetrics();
+    renderCatalog();
+    renderCheckoutBar();
+    renderQueueBanner();
+    sincronizarDesdeExcel(true);
+  </script>
+</body>
+</html>
