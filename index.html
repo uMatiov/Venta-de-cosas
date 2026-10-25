@@ -59,7 +59,7 @@
     body {
       max-width: 540px;
       margin: 0 auto;
-      padding-bottom: 240px;
+      padding-bottom: 260px;
     }
 
     .tabular {
@@ -67,7 +67,7 @@
       font-family: var(--font-mono);
     }
 
-    /* TOAST CORREGIDO (Invisible cuando no está activo) */
+    /* TOAST */
     .toast {
       position: fixed;
       top: 14px;
@@ -405,7 +405,7 @@
       font-weight: 800;
     }
 
-    /* PANEL DE ADMINISTRACIÓN (COSTOS Y PRECIOS) */
+    /* PANEL DE ADMINISTRACIÓN */
     .admin-view {
       display: none;
       padding: 14px 16px 40px;
@@ -613,7 +613,7 @@
       border-color: var(--text-primary);
     }
 
-    /* BARRA INFERIOR DE COBRO */
+    /* BARRA INFERIOR DE COBRO MEJORADA */
     .checkout-dock {
       position: fixed;
       bottom: 0;
@@ -641,56 +641,70 @@
       gap: 8px;
     }
 
+    /* MEJORA 1: CONTRASTE NEGRO SÓLIDO EN EFECTIVO VS TRANSFERENCIA */
     .pay-toggle {
       display: flex;
       flex: 1;
-      background: var(--bg-canvas);
-      padding: 3px;
+      background: var(--bg-elevated);
+      padding: 4px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle);
+      gap: 4px;
     }
 
     .pay-opt {
       flex: 1;
-      min-height: 38px;
-      border: none;
+      min-height: 42px;
+      border: 1px solid transparent;
       background: transparent;
       border-radius: 6px;
       font-family: var(--font-sans);
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
       cursor: pointer;
+      transition: all 0.15s ease;
     }
 
     .pay-opt.active {
-      background: var(--bg-surface);
-      color: var(--text-primary);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      background: var(--text-primary);
+      color: #ffffff;
+      border-color: var(--text-primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
     }
 
     .btn-clear-cart {
-      min-height: 38px;
-      padding: 0 12px;
+      min-height: 42px;
+      padding: 0 14px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle);
       background: var(--bg-canvas);
       color: var(--text-secondary);
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
     }
 
+    /* MEJORA 2: BOTONES RÁPIDOS + INPUT DE MONTO EXACTO ($8.100) */
     .change-helper {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
+      gap: 8px;
       font-size: 0.78rem;
       color: var(--text-secondary);
       background: var(--bg-canvas);
-      padding: 6px 10px;
+      padding: 8px 10px;
       border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .pay-inputs-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .bill-chips {
@@ -699,19 +713,72 @@
     }
 
     .bill-chip {
-      padding: 4px 8px;
+      min-height: 34px;
+      padding: 4px 9px;
       border-radius: 6px;
       border: 1px solid var(--border-subtle);
       background: var(--bg-surface);
-      font-size: 0.72rem;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
       font-weight: 700;
       cursor: pointer;
     }
 
     .bill-chip.active {
-      background: var(--accent-soft);
-      border-color: var(--accent-primary);
-      color: var(--accent-primary);
+      background: var(--text-primary);
+      border-color: var(--text-primary);
+      color: #ffffff;
+    }
+
+    .exact-cash-input {
+      width: 92px;
+      height: 34px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .exact-cash-input:focus {
+      outline: 2px solid var(--accent-primary);
+      border-color: transparent;
+      background: #ffffff;
+    }
+
+    .exact-cash-input::placeholder {
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.74rem;
+    }
+
+    .change-badge {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      margin-left: auto;
+    }
+
+    .change-badge.positive {
+      background: var(--success-bg);
+      color: var(--success-text);
+      border-color: rgba(22, 101, 52, 0.25);
+    }
+
+    .change-badge.negative {
+      background: var(--danger-bg);
+      color: var(--danger-text);
+      border-color: rgba(153, 27, 27, 0.25);
     }
 
     .submit-btn {
@@ -820,13 +887,11 @@
       💾 Guardar cambios y recalcular Excel
     </button>
 
-    <!-- Editor de Precios de Venta y vista de Costo/Ganancia -->
     <div class="admin-card">
       <div class="admin-card-title">1. Precios de Venta y Márgenes (Catálogo)</div>
       <div id="adminCatalogList"></div>
     </div>
 
-    <!-- Editor de Insumos -->
     <div class="admin-card">
       <div class="admin-card-title">2. Costo de Ingredientes y Empaque (Insumos)</div>
       <div id="adminInsumosList"></div>
@@ -841,22 +906,34 @@
   <footer id="checkoutDock" class="checkout-dock">
     <div class="checkout-inner">
       <div class="payment-row">
-        <div class="pay-toggle" role="group">
+        <div class="pay-toggle" role="group" aria-label="Método de pago">
           <button type="button" class="pay-opt active" data-pay="Efectivo">💵 Efectivo</button>
           <button type="button" class="pay-opt" data-pay="Transferencia">🏦 Transferencia</button>
         </div>
         <button type="button" class="btn-clear-cart" id="btnClear">Limpiar</button>
       </div>
 
+      <!-- CALCULADORA DE VUELTO: BOTONES RÁPIDOS + MONTO EXACTO -->
       <div id="changeRow" class="change-helper">
-        <span>Paga con:</span>
-        <div class="bill-chips">
-          <button type="button" class="bill-chip" data-bill="2000">$2k</button>
-          <button type="button" class="bill-chip" data-bill="5000">$5k</button>
-          <button type="button" class="bill-chip" data-bill="10000">$10k</button>
-          <button type="button" class="bill-chip" data-bill="20000">$20k</button>
+        <div class="pay-inputs-wrap">
+          <div class="bill-chips">
+            <button type="button" class="bill-chip" data-bill="2000">$2k</button>
+            <button type="button" class="bill-chip" data-bill="5000">$5k</button>
+            <button type="button" class="bill-chip" data-bill="10000">$10k</button>
+            <button type="button" class="bill-chip" data-bill="20000">$20k</button>
+          </div>
+          <input
+            type="number"
+            id="customCashInput"
+            class="exact-cash-input tabular"
+            inputmode="numeric"
+            placeholder="Otro $ (8100)"
+            min="0"
+            step="100"
+            aria-label="Escribir monto exacto con el que paga el cliente"
+          />
         </div>
-        <span id="changeOutput" class="tabular" style="font-weight:700;">Vuelto: $0</span>
+        <span id="changeOutput" class="change-badge tabular">Vuelto: $0</span>
       </div>
 
       <button type="button" id="btnSubmit" class="submit-btn" disabled>
@@ -915,7 +992,7 @@
       carrito: {},
       categoriaActiva: 'TODOS',
       metodoPago: 'Efectivo',
-      billeteSeleccionado: 0,
+      montoPagado: 0,
       cargando: false,
       modoAdmin: false,
       adminPin: null
@@ -1068,14 +1145,26 @@
           : `Anote ${totalUnidades} ${totalUnidades === 1 ? 'unidad' : 'unidades'} →`;
       }
 
-      if (state.billeteSeleccionado > 0 && totalMonto > 0) {
-        const vuelto = state.billeteSeleccionado - totalMonto;
-        changeOutput.textContent = vuelto >= 0
-          ? `Vuelto: ${clpFormat.format(vuelto)}`
-          : `Faltan: ${clpFormat.format(Math.abs(vuelto))}`;
+      changeOutput.classList.remove('positive', 'negative');
+
+      if (state.montoPagado > 0 && totalMonto > 0) {
+        const vuelto = state.montoPagado - totalMonto;
+        if (vuelto >= 0) {
+          changeOutput.textContent = `Vuelto: ${clpFormat.format(vuelto)}`;
+          changeOutput.classList.add('positive');
+        } else {
+          changeOutput.textContent = `Faltan: ${clpFormat.format(Math.abs(vuelto))}`;
+          changeOutput.classList.add('negative');
+        }
       } else {
         changeOutput.textContent = 'Vuelto: $0';
       }
+    }
+
+    function limpiarMontoPagado() {
+      state.montoPagado = 0;
+      document.getElementById('customCashInput').value = '';
+      document.querySelectorAll('.bill-chip').forEach(c => c.classList.remove('active'));
     }
 
     function guardarEstadoLocal(data) {
@@ -1282,8 +1371,7 @@
       localStorage.setItem(STORAGE_KEYS.SUMMARY, JSON.stringify(state.resumen));
 
       state.carrito = {};
-      state.billeteSeleccionado = 0;
-      document.querySelectorAll('.bill-chip').forEach(b => b.classList.remove('active'));
+      limpiarMontoPagado();
       renderMetrics();
       renderCatalog();
 
@@ -1384,7 +1472,9 @@
       text.textContent = online ? 'En línea' : 'Offline';
     }
 
-    // EVENTOS
+    // =========================================================
+    // EVENTOS DE INTERFAZ Y CALCULADORA DE VUELTO
+    // =========================================================
     document.getElementById('catalogContainer').addEventListener('click', (e) => {
       const btn = e.target.closest('.step-btn');
       if (!btn) return;
@@ -1417,25 +1507,39 @@
       document.getElementById('changeRow').style.display = state.metodoPago === 'Efectivo' ? 'flex' : 'none';
     });
 
+    // Selección de billetes rápidos ($2k, $5k, $10k, $20k)
     document.querySelector('.bill-chips').addEventListener('click', (e) => {
       const chip = e.target.closest('.bill-chip');
       if (!chip) return;
       const val = Number(chip.dataset.bill);
-      if (state.billeteSeleccionado === val) {
-        state.billeteSeleccionado = 0;
+      const customInput = document.getElementById('customCashInput');
+
+      if (state.montoPagado === val && chip.classList.contains('active')) {
+        state.montoPagado = 0;
         chip.classList.remove('active');
+        customInput.value = '';
       } else {
         document.querySelectorAll('.bill-chip').forEach(c => c.classList.remove('active'));
-        state.billeteSeleccionado = val;
+        state.montoPagado = val;
         chip.classList.add('active');
+        customInput.value = String(val);
       }
+      renderCheckoutBar();
+    });
+
+    // Escritura manual de monto exacto (ej. 8100)
+    document.getElementById('customCashInput').addEventListener('input', (e) => {
+      const val = Number(e.target.value) || 0;
+      state.montoPagado = val;
+      document.querySelectorAll('.bill-chip').forEach(c => {
+        c.classList.toggle('active', Number(c.dataset.bill) === val);
+      });
       renderCheckoutBar();
     });
 
     document.getElementById('btnClear').addEventListener('click', () => {
       state.carrito = {};
-      state.billeteSeleccionado = 0;
-      document.querySelectorAll('.bill-chip').forEach(c => c.classList.remove('active'));
+      limpiarMontoPagado();
       renderCatalog();
       renderCheckoutBar();
     });
