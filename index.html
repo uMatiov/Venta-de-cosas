@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#18181b" />
-  <meta name="description" content="Terminal Punto de Venta móvil para Dulces Migajas conectado a Google Sheets." />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="Terminal Punto de Venta móvil y Panel de Costos para Dulces Migajas." />
   <title>Dulces Migajas — POS</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,7 +36,6 @@
       --danger-text: #991b1b;
       --radius-sm: 8px;
       --radius-md: 12px;
-      --radius-lg: 16px;
       --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'DM Mono', monospace;
     }
@@ -70,12 +67,38 @@
       font-family: var(--font-mono);
     }
 
-    /* HEADER & STATUS */
+    /* TOAST CORREGIDO (Invisible cuando no está activo) */
+    .toast {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-24px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      background: var(--text-primary);
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      max-width: 92vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* HEADER */
     .app-header {
       position: sticky;
       top: 0;
       z-index: 30;
-      background: rgba(246, 244, 240, 0.94);
+      background: rgba(246, 244, 240, 0.95);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border-subtle);
       padding: 12px 16px;
@@ -125,32 +148,31 @@
 
     .header-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       margin-top: 10px;
     }
 
     .btn-ghost {
       flex: 1;
       min-height: 40px;
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-subtle);
       background: var(--bg-surface);
       color: var(--text-primary);
       font-family: var(--font-sans);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
       transition: transform 0.1s ease, background-color 0.15s ease;
     }
 
     .btn-ghost:active {
       transform: scale(0.98);
-      background: var(--bg-elevated);
     }
 
     .btn-ghost.danger {
@@ -158,7 +180,13 @@
       border-color: #fecaca;
     }
 
-    /* OFFLINE QUEUE BANNER */
+    .btn-ghost.admin-active {
+      background: var(--text-primary);
+      color: #ffffff;
+      border-color: var(--text-primary);
+    }
+
+    /* COLA OFFLINE */
     .queue-banner {
       display: none;
       margin: 12px 16px 0;
@@ -188,10 +216,9 @@
       font-weight: 800;
       font-size: 0.78rem;
       cursor: pointer;
-      white-space: nowrap;
     }
 
-    /* KPI METRICS STRIP */
+    /* KPI METRICS */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -213,23 +240,19 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .metric-value {
       font-size: clamp(1rem, 3.8vw, 1.2rem);
       font-weight: 700;
       margin-top: 4px;
-      color: var(--text-primary);
     }
 
     .metric-value.profit {
       color: var(--success-text);
     }
 
-    /* CATEGORY FILTER TABS */
+    /* FILTROS */
     .filter-bar {
       display: flex;
       gap: 8px;
@@ -254,7 +277,6 @@
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.15s ease;
     }
 
     .tab-btn.active {
@@ -263,7 +285,7 @@
       border-color: var(--text-primary);
     }
 
-    /* PRODUCT LIST */
+    /* LISTA DE PRODUCTOS */
     .catalog-section {
       padding: 4px 16px 16px;
       display: flex;
@@ -280,7 +302,6 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     .product-row.selected {
@@ -305,7 +326,6 @@
       font-size: 0.68rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
       padding: 2px 8px;
       border-radius: 6px;
     }
@@ -328,10 +348,6 @@
     .product-name {
       font-size: 1rem;
       font-weight: 800;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .product-price-line {
@@ -339,6 +355,7 @@
       align-items: baseline;
       gap: 8px;
       margin-top: 2px;
+      flex-wrap: wrap;
     }
 
     .product-price {
@@ -352,12 +369,10 @@
       color: var(--text-muted);
     }
 
-    /* STEPPER CONTROLS (48x48px touch targets) */
     .stepper {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-shrink: 0;
     }
 
     .step-btn {
@@ -370,21 +385,12 @@
       font-size: 1.3rem;
       font-weight: 800;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      transition: transform 0.08s ease, background-color 0.12s ease;
     }
 
     .step-btn.plus {
       background: var(--text-primary);
       color: #ffffff;
       border-color: var(--text-primary);
-    }
-
-    .step-btn:active {
-      transform: scale(0.92);
     }
 
     .step-btn:disabled {
@@ -399,7 +405,215 @@
       font-weight: 800;
     }
 
-    /* STICKY CHECKOUT BAR */
+    /* PANEL DE ADMINISTRACIÓN (COSTOS Y PRECIOS) */
+    .admin-view {
+      display: none;
+      padding: 14px 16px 40px;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .admin-view.active {
+      display: flex;
+    }
+
+    .admin-banner {
+      background: #18181b;
+      color: #ffffff;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .admin-banner h2 {
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .admin-banner p {
+      font-size: 0.75rem;
+      color: #a1a1aa;
+      margin-top: 2px;
+    }
+
+    .admin-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .admin-card-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+
+    .admin-item-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border-subtle);
+    }
+
+    .admin-item-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .admin-item-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .admin-item-sub {
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .admin-inputs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .input-group label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .num-input {
+      width: 96px;
+      height: 40px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-canvas);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: right;
+      color: var(--text-primary);
+    }
+
+    .num-input.small {
+      width: 74px;
+    }
+
+    .num-input:focus {
+      outline: 2px solid var(--accent-primary);
+      background: #ffffff;
+    }
+
+    .btn-save-admin {
+      width: 100%;
+      min-height: 52px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--success-text);
+      color: #ffffff;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(22, 101, 52, 0.25);
+    }
+
+    .btn-save-admin:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* MODAL DE CONTRASEÑA */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(24, 24, 27, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 360px;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .pin-input {
+      width: 100%;
+      height: 48px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-canvas);
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-modal {
+      flex: 1;
+      min-height: 44px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-canvas);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-modal.primary {
+      background: var(--text-primary);
+      color: #ffffff;
+      border-color: var(--text-primary);
+    }
+
+    /* BARRA INFERIOR DE COBRO */
     .checkout-dock {
       position: fixed;
       bottom: 0;
@@ -467,7 +681,6 @@
       cursor: pointer;
     }
 
-    /* QUICK CHANGE CALCULATOR */
     .change-helper {
       display: flex;
       align-items: center;
@@ -516,15 +729,6 @@
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: background-color 0.15s ease, transform 0.08s ease;
-    }
-
-    .submit-btn:hover {
-      background: var(--accent-primary-hover);
-    }
-
-    .submit-btn:active {
-      transform: scale(0.99);
     }
 
     .submit-btn:disabled {
@@ -532,44 +736,26 @@
       color: #71717a;
       cursor: not-allowed;
     }
-
-    /* TOAST FEEDBACK */
-    .toast {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-120%);
-      z-index: 60;
-      background: var(--text-primary);
-      color: #ffffff;
-      padding: 12px 18px;
-      border-radius: var(--radius-md);
-      font-size: 0.85rem;
-      font-weight: 700;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
-      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-      max-width: 92vw;
-      text-align: center;
-    }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 36px 20px;
-      background: var(--bg-surface);
-      border-radius: var(--radius-md);
-      border: 1px dashed var(--border-subtle);
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
   </style>
 </head>
 <body>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- MODAL DE CONTRASEÑA ADMIN -->
+  <div id="pinModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle">
+    <form id="pinForm" class="modal-box">
+      <div id="pinModalTitle" class="modal-title">🔒 Acceso Administrador</div>
+      <p style="font-size:0.82rem; color:var(--text-secondary);">
+        Ingresa la contraseña para editar costos de insumos y precios de venta en el Excel:
+      </p>
+      <input type="password" id="pinInput" class="pin-input" placeholder="Contraseña..." autocomplete="current-password" required />
+      <div class="modal-actions">
+        <button type="button" id="btnCancelPin" class="btn-modal">Cancelar</button>
+        <button type="submit" id="btnConfirmPin" class="btn-modal primary">Entrar</button>
+      </div>
+    </form>
+  </div>
 
   <header class="app-header">
     <div class="header-top">
@@ -578,27 +764,23 @@
       </h1>
       <div id="connStatus" class="status-pill">
         <span class="status-dot"></span>
-        <span id="connText">Conectado</span>
+        <span id="connText">En línea</span>
       </div>
     </div>
     <div class="header-actions">
-      <button type="button" class="btn-ghost" id="btnRefresh" aria-label="Sincronizar catálogo y resumen">
-        ↻ Actualizar Excel
-      </button>
-      <button type="button" class="btn-ghost danger" id="btnUndo" aria-label="Deshacer última venta">
-        ⌫ Deshacer última
-      </button>
+      <button type="button" class="btn-ghost" id="btnRefresh">↻ Actualizar</button>
+      <button type="button" class="btn-ghost danger" id="btnUndo">⌫ Deshacer</button>
+      <button type="button" class="btn-ghost" id="btnToggleAdmin">🔒 Admin</button>
     </div>
   </header>
 
-  <!-- Cola Offline por si falla la señal -->
   <div id="queueBanner" class="queue-banner">
     <span id="queueText">Tienes ventas pendientes por subir</span>
     <button type="button" class="btn-sync-now" id="btnSyncQueue">Subir ahora</button>
   </div>
 
-  <main>
-    <!-- Tarjetas de Resumen en vivo desde la hoja Resumen -->
+  <!-- VISTA 1: PUNTO DE VENTA (POS) -->
+  <main id="posView">
     <section class="metrics-grid" aria-label="Resumen de ventas del día">
       <article class="metric-card">
         <div class="metric-label">Ventas Hoy</div>
@@ -614,22 +796,52 @@
       </article>
     </section>
 
-    <!-- Filtros por Categoría -->
     <nav class="filter-bar" aria-label="Filtrar por categoría">
       <button type="button" class="tab-btn active" data-cat="TODOS">Todos</button>
-      <button type="button" class="tab-btn" data-cat="Muffins">Muffins ($1.500)</button>
-      <button type="button" class="tab-btn" data-cat="Budines">Budines ($4.500)</button>
+      <button type="button" class="tab-btn" data-cat="Muffins">Muffins</button>
+      <button type="button" class="tab-btn" data-cat="Budines">Budines</button>
+      <button type="button" class="tab-btn" data-cat="Combos">Combos</button>
     </nav>
 
-    <!-- Lista de Productos -->
-    <section id="catalogContainer" class="catalog-section" aria-label="Catálogo de productos"></section>
+    <section id="catalogContainer" class="catalog-section"></section>
   </main>
 
-  <!-- Barra Inferior Fija de Cobro -->
-  <footer class="checkout-dock">
+  <!-- VISTA 2: PANEL DE ADMINISTRACIÓN PROTEGIDO -->
+  <section id="adminView" class="admin-view" aria-label="Panel de edición de costos y precios">
+    <div class="admin-banner">
+      <div>
+        <h2>⚙️ Editor de Costos e Insumos</h2>
+        <p>Al guardar, el Excel recalcula Recetario, Costo Unitario y Ganancia Neta automáticamente.</p>
+      </div>
+      <button type="button" id="btnExitAdmin" class="btn-sync-now" style="border:none;">Volver al POS</button>
+    </div>
+
+    <button type="button" id="btnSaveAdminTop" class="btn-save-admin">
+      💾 Guardar cambios y recalcular Excel
+    </button>
+
+    <!-- Editor de Precios de Venta y vista de Costo/Ganancia -->
+    <div class="admin-card">
+      <div class="admin-card-title">1. Precios de Venta y Márgenes (Catálogo)</div>
+      <div id="adminCatalogList"></div>
+    </div>
+
+    <!-- Editor de Insumos -->
+    <div class="admin-card">
+      <div class="admin-card-title">2. Costo de Ingredientes y Empaque (Insumos)</div>
+      <div id="adminInsumosList"></div>
+    </div>
+
+    <button type="button" id="btnSaveAdminBottom" class="btn-save-admin">
+      💾 Guardar cambios y recalcular Excel
+    </button>
+  </section>
+
+  <!-- BARRA DE COBRO DEL POS -->
+  <footer id="checkoutDock" class="checkout-dock">
     <div class="checkout-inner">
       <div class="payment-row">
-        <div class="pay-toggle" role="group" aria-label="Método de pago">
+        <div class="pay-toggle" role="group">
           <button type="button" class="pay-opt active" data-pay="Efectivo">💵 Efectivo</button>
           <button type="button" class="pay-opt" data-pay="Transferencia">🏦 Transferencia</button>
         </div>
@@ -655,29 +867,46 @@
   </footer>
 
   <script>
-    // =========================================================
-    // CONFIGURACIÓN CON TU URL DE GOOGLE APPS SCRIPT
-    // =========================================================
     const API_URL = 'https://script.google.com/macros/s/AKfycbyotaJufuix2wAC6VRtz5uuxKI_cDeLVEnvnpj0tG3wjsD4G8rD05x1vd4u2Sb_y-m9Ig/exec';
 
-    // Catálogo de respaldo instantáneo (idéntico a tu pestaña Catalogo)
     const FALLBACK_CATALOG = [
-      { sku: 'MUF-MAR', categoria: 'Muffins', sabor: 'Muffin marmolado', costoUnitario: 410, precioVenta: 1500, gananciaNeta: 1090 },
-      { sku: 'MUF-CHI', categoria: 'Muffins', sabor: 'Muffin chispitas', costoUnitario: 423, precioVenta: 1500, gananciaNeta: 1077 },
-      { sku: 'MUF-BOR', categoria: 'Muffins', sabor: 'Muffin borrachito', costoUnitario: 398, precioVenta: 1500, gananciaNeta: 1102 },
-      { sku: 'BUD-BAN', categoria: 'Budines', sabor: 'Budin de banana', costoUnitario: 906, precioVenta: 4500, gananciaNeta: 3594 },
-      { sku: 'BUD-CHO', categoria: 'Budines', sabor: 'Budin de chocolate', costoUnitario: 1033, precioVenta: 4500, gananciaNeta: 3467 },
-      { sku: 'BUD-CHI', categoria: 'Budines', sabor: 'Budin de chips y nueces', costoUnitario: 2106, precioVenta: 4500, gananciaNeta: 2394 }
+      { sku: 'BUD-BAN', categoria: 'Budines', sabor: 'Budin de banana', costoUnitario: 906, precioVenta: 4500, gananciaNeta: 3594, activo: true },
+      { sku: 'BUD-CHO', categoria: 'Budines', sabor: 'Budin de chocolate', costoUnitario: 1033, precioVenta: 4500, gananciaNeta: 3467, activo: true },
+      { sku: 'BUD-CHI', categoria: 'Budines', sabor: 'Budin de chips y nueces', costoUnitario: 2106, precioVenta: 4500, gananciaNeta: 2394, activo: true },
+      { sku: 'MUF-MAR', categoria: 'Muffins', sabor: 'Muffin marmolado', costoUnitario: 410, precioVenta: 1500, gananciaNeta: 1090, activo: true },
+      { sku: 'MUF-CHI', categoria: 'Muffins', sabor: 'Muffin chispitas', costoUnitario: 423, precioVenta: 1500, gananciaNeta: 1077, activo: true },
+      { sku: 'MUF-BOR', categoria: 'Muffins', sabor: 'Muffin borrachito', costoUnitario: 398, precioVenta: 1500, gananciaNeta: 1102, activo: true }
+    ];
+
+    const FALLBACK_INSUMOS = [
+      { id: 'INS-01', nombre: 'Harina leudante', cantidadCompra: 1000, unidad: 'g', precioCompra: 1020, costoUnitario: 1.02 },
+      { id: 'INS-02', nombre: 'Huevo', cantidadCompra: 30, unidad: 'un', precioCompra: 6000, costoUnitario: 200 },
+      { id: 'INS-03', nombre: 'Harina 0000', cantidadCompra: 1000, unidad: 'g', precioCompra: 600, costoUnitario: 0.6 },
+      { id: 'INS-04', nombre: 'Esencia de vainilla', cantidadCompra: 1000, unidad: 'ml', precioCompra: 3000, costoUnitario: 3 },
+      { id: 'INS-05', nombre: 'Aceite', cantidadCompra: 1500, unidad: 'ml', precioCompra: 5645, costoUnitario: 3.76 },
+      { id: 'INS-06', nombre: 'Leche', cantidadCompra: 1000, unidad: 'ml', precioCompra: 1890, costoUnitario: 1.89 },
+      { id: 'INS-07', nombre: 'Azucar', cantidadCompra: 1000, unidad: 'g', precioCompra: 995, costoUnitario: 1 },
+      { id: 'INS-08', nombre: 'Manteca', cantidadCompra: 200, unidad: 'g', precioCompra: 1900, costoUnitario: 9.5 },
+      { id: 'INS-09', nombre: 'Grasa bovina', cantidadCompra: 500, unidad: 'g', precioCompra: 2500, costoUnitario: 5 },
+      { id: 'INS-10', nombre: 'Chips de chocolate', cantidadCompra: 305, unidad: 'g', precioCompra: 4575, costoUnitario: 15 },
+      { id: 'INS-11', nombre: 'Nueces', cantidadCompra: 100, unidad: 'g', precioCompra: 3000, costoUnitario: 30 },
+      { id: 'INS-12', nombre: 'Empaque', cantidadCompra: 1, unidad: 'un', precioCompra: 183, costoUnitario: 183 },
+      { id: 'INS-13', nombre: 'Cacao amargo', cantidadCompra: 200, unidad: 'g', precioCompra: 3500, costoUnitario: 17.5 },
+      { id: 'INS-14', nombre: 'Bananas', cantidadCompra: 2000, unidad: 'g', precioCompra: 2500, costoUnitario: 1.25 },
+      { id: 'INS-15', nombre: 'Limones', cantidadCompra: 2000, unidad: 'g', precioCompra: 1500, costoUnitario: 0.75 },
+      { id: 'INS-16', nombre: 'Dulce de leche', cantidadCompra: 1000, unidad: 'g', precioCompra: 3500, costoUnitario: 3.5 }
     ];
 
     const STORAGE_KEYS = {
-      CATALOG: 'dm_pos_catalog_v1',
-      SUMMARY: 'dm_pos_summary_v1',
-      QUEUE: 'dm_pos_offline_queue_v1'
+      CATALOG: 'dm_pos_catalog_v2',
+      INSUMOS: 'dm_pos_insumos_v2',
+      SUMMARY: 'dm_pos_summary_v2',
+      QUEUE: 'dm_pos_offline_queue_v2'
     };
 
     let state = {
       catalogo: JSON.parse(localStorage.getItem(STORAGE_KEYS.CATALOG)) || FALLBACK_CATALOG,
+      insumos: JSON.parse(localStorage.getItem(STORAGE_KEYS.INSUMOS)) || FALLBACK_INSUMOS,
       resumen: JSON.parse(localStorage.getItem(STORAGE_KEYS.SUMMARY)) || {
         ventasHoyBruto: 0,
         gananciaHoyNeta: 0,
@@ -687,7 +916,9 @@
       categoriaActiva: 'TODOS',
       metodoPago: 'Efectivo',
       billeteSeleccionado: 0,
-      cargando: false
+      cargando: false,
+      modoAdmin: false,
+      adminPin: null
     };
 
     const clpFormat = new Intl.NumberFormat('es-CL', {
@@ -696,9 +927,14 @@
       maximumFractionDigits: 0
     });
 
-    // =========================================================
-    // RENDERIZADO DE INTERFAZ
-    // =========================================================
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
     function renderMetrics() {
       document.getElementById('kpiBruto').textContent = clpFormat.format(state.resumen.ventasHoyBruto || 0);
       document.getElementById('kpiNeta').textContent = clpFormat.format(state.resumen.gananciaHoyNeta || 0);
@@ -707,12 +943,13 @@
 
     function renderCatalog() {
       const container = document.getElementById('catalogContainer');
+      const activos = state.catalogo.filter(p => p.activo !== false);
       const filtrados = state.categoriaActiva === 'TODOS'
-        ? state.catalogo
-        : state.catalogo.filter(p => p.categoria.toLowerCase() === state.categoriaActiva.toLowerCase());
+        ? activos
+        : activos.filter(p => p.categoria.toLowerCase() === state.categoriaActiva.toLowerCase());
 
       if (!filtrados.length) {
-        container.innerHTML = `<div class="empty-state">No hay productos activos en esta categoría.</div>`;
+        container.innerHTML = `<div style="text-align:center;padding:28px;background:#fff;border-radius:12px;border:1px dashed #d4d0c8;color:#71717a;">No hay productos en esta categoría.</div>`;
         return;
       }
 
@@ -722,7 +959,7 @@
         const badgeClass = isBudin ? 'budines' : 'muffins';
 
         return `
-          <article class="product-row ${qty > 0 ? 'selected' : ''}" data-sku="${prod.sku}">
+          <article class="product-row ${qty > 0 ? 'selected' : ''}">
             <div class="product-info">
               <div class="product-badges">
                 <span class="cat-badge ${badgeClass}">${prod.categoria}</span>
@@ -731,15 +968,65 @@
               <div class="product-name">${prod.sabor}</div>
               <div class="product-price-line">
                 <span class="product-price tabular">${clpFormat.format(prod.precioVenta)}</span>
-                <span class="product-profit-hint tabular">(+${clpFormat.format(prod.gananciaNeta)} neto)</span>
+                <span class="product-profit-hint tabular">Costo: ${clpFormat.format(prod.costoUnitario)} · Ganancia: +${clpFormat.format(prod.gananciaNeta)}</span>
               </div>
             </div>
             <div class="stepper">
-              <button type="button" class="step-btn minus" data-action="minus" data-sku="${prod.sku}" ${qty === 0 ? 'disabled' : ''} aria-label="Restar ${prod.sabor}">−</button>
+              <button type="button" class="step-btn minus" data-action="minus" data-sku="${prod.sku}" ${qty === 0 ? 'disabled' : ''}>−</button>
               <span class="qty-display tabular">${qty}</span>
-              <button type="button" class="step-btn plus" data-action="plus" data-sku="${prod.sku}" aria-label="Sumar ${prod.sabor}">+</button>
+              <button type="button" class="step-btn plus" data-action="plus" data-sku="${prod.sku}">+</button>
             </div>
           </article>
+        `;
+      }).join('');
+    }
+
+    function renderAdminPanel() {
+      const catList = document.getElementById('adminCatalogList');
+      const insList = document.getElementById('adminInsumosList');
+
+      catList.innerHTML = state.catalogo.map(p => {
+        const margen = p.precioVenta > 0 ? ((p.gananciaNeta / p.precioVenta) * 100).toFixed(1) : '0.0';
+        return `
+          <div class="admin-item-row">
+            <div>
+              <div class="admin-item-title">${p.sabor}</div>
+              <div class="admin-item-sub tabular">
+                Costo Receta: <strong>${clpFormat.format(p.costoUnitario)}</strong> ·
+                Ganancia: <strong style="color:var(--success-text);">${clpFormat.format(p.gananciaNeta)} (${margen}%)</strong>
+              </div>
+            </div>
+            <div class="admin-inputs">
+              <div class="input-group">
+                <label>Precio Venta ($)</label>
+                <input type="number" class="num-input admin-price-input" data-sku="${p.sku}" value="${p.precioVenta}" step="100" min="0" />
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      insList.innerHTML = state.insumos.map(ins => {
+        const unitCost = Number(ins.costoUnitario || (ins.precioCompra / (ins.cantidadCompra || 1))).toFixed(2);
+        return `
+          <div class="admin-item-row">
+            <div>
+              <div class="admin-item-title">${ins.nombre}</div>
+              <div class="admin-item-sub tabular">
+                ${ins.id} · Costo por ${ins.unidad}: <strong>$${unitCost}</strong>
+              </div>
+            </div>
+            <div class="admin-inputs">
+              <div class="input-group">
+                <label>Formato (${ins.unidad})</label>
+                <input type="number" class="num-input small admin-ins-qty" data-id="${ins.id}" value="${ins.cantidadCompra}" step="any" min="1" />
+              </div>
+              <div class="input-group">
+                <label>Precio Compra ($)</label>
+                <input type="number" class="num-input admin-ins-price" data-id="${ins.id}" value="${ins.precioCompra}" step="50" min="0" />
+              </div>
+            </div>
+          </div>
         `;
       }).join('');
     }
@@ -791,30 +1078,21 @@
       }
     }
 
-    function renderQueueBanner() {
-      const queue = obtenerColaOffline();
-      const banner = document.getElementById('queueBanner');
-      const text = document.getElementById('queueText');
-
-      if (queue.length > 0) {
-        banner.classList.add('visible');
-        text.textContent = `${queue.length} ${queue.length === 1 ? 'venta pendiente' : 'ventas pendientes'} de subir al Excel`;
-      } else {
-        banner.classList.remove('visible');
+    function guardarEstadoLocal(data) {
+      if (Array.isArray(data.catalogo) && data.catalogo.length > 0) {
+        state.catalogo = data.catalogo;
+        localStorage.setItem(STORAGE_KEYS.CATALOG, JSON.stringify(data.catalogo));
+      }
+      if (Array.isArray(data.insumos) && data.insumos.length > 0) {
+        state.insumos = data.insumos;
+        localStorage.setItem(STORAGE_KEYS.INSUMOS, JSON.stringify(data.insumos));
+      }
+      if (data.resumen) {
+        state.resumen = data.resumen;
+        localStorage.setItem(STORAGE_KEYS.SUMMARY, JSON.stringify(data.resumen));
       }
     }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
-    }
-
-    // =========================================================
-    // SINCRONIZACIÓN CON GOOGLE SHEETS (GET & POST)
-    // =========================================================
     async function sincronizarDesdeExcel(silencioso = false) {
       const btnRefresh = document.getElementById('btnRefresh');
       if (!silencioso) btnRefresh.textContent = '↻ Cargando...';
@@ -824,28 +1102,152 @@
         const data = await res.json();
 
         if (data && data.ok) {
-          if (Array.isArray(data.catalogo) && data.catalogo.length > 0) {
-            state.catalogo = data.catalogo;
-            localStorage.setItem(STORAGE_KEYS.CATALOG, JSON.stringify(data.catalogo));
-          }
-          if (data.resumen) {
-            state.resumen = data.resumen;
-            localStorage.setItem(STORAGE_KEYS.SUMMARY, JSON.stringify(data.resumen));
-          }
+          guardarEstadoLocal(data);
           actualizarEstadoConexion(true);
           renderMetrics();
           renderCatalog();
+          renderAdminPanel();
           renderCheckoutBar();
           if (!silencioso) showToast('✓ Sincronizado con Google Sheets');
         }
       } catch (err) {
         actualizarEstadoConexion(false);
-        if (!silencioso) showToast('Modo Offline: usando catálogo guardado');
+        if (!silencioso) showToast('Modo Offline: usando datos guardados');
       } finally {
-        btnRefresh.textContent = '↻ Actualizar Excel';
+        btnRefresh.textContent = '↻ Actualizar';
       }
     }
 
+    // =========================================================
+    // FLUJO DE ADMINISTRACIÓN CON CONTRASEÑA
+    // =========================================================
+    function toggleVistaAdmin(mostrar) {
+      state.modoAdmin = mostrar;
+      document.getElementById('posView').style.display = mostrar ? 'none' : 'block';
+      document.getElementById('checkoutDock').style.display = mostrar ? 'none' : 'block';
+      document.getElementById('adminView').classList.toggle('active', mostrar);
+      document.getElementById('btnToggleAdmin').classList.toggle('admin-active', mostrar);
+      if (mostrar) renderAdminPanel();
+    }
+
+    document.getElementById('btnToggleAdmin').addEventListener('click', () => {
+      if (state.modoAdmin) {
+        toggleVistaAdmin(false);
+        return;
+      }
+      if (state.adminPin) {
+        toggleVistaAdmin(true);
+      } else {
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinModal').classList.add('open');
+        setTimeout(() => document.getElementById('pinInput').focus(), 80);
+      }
+    });
+
+    document.getElementById('btnExitAdmin').addEventListener('click', () => toggleVistaAdmin(false));
+    document.getElementById('btnCancelPin').addEventListener('click', () => {
+      document.getElementById('pinModal').classList.remove('open');
+    });
+
+    document.getElementById('pinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pin = document.getElementById('pinInput').value.trim();
+      if (!pin) return;
+
+      const btn = document.getElementById('btnConfirmPin');
+      btn.textContent = 'Verificando...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ accion: 'verificar_pin', pin })
+        });
+        const data = await res.json();
+
+        if (data && data.ok) {
+          state.adminPin = pin;
+          guardarEstadoLocal(data);
+          document.getElementById('pinModal').classList.remove('open');
+          toggleVistaAdmin(true);
+          showToast('🔓 Modo Administrador activado');
+        } else {
+          showToast('❌ ' + (data.error || 'Contraseña incorrecta'));
+        }
+      } catch (err) {
+        showToast('Necesitas conexión a internet para validar el acceso');
+      } finally {
+        btn.textContent = 'Entrar';
+        btn.disabled = false;
+      }
+    });
+
+    async function guardarCambiosAdmin() {
+      if (!state.adminPin) return;
+
+      const btnTop = document.getElementById('btnSaveAdminTop');
+      const btnBot = document.getElementById('btnSaveAdminBottom');
+      btnTop.disabled = true;
+      btnBot.disabled = true;
+      btnTop.textContent = '⏳ Recalculando en Excel...';
+      btnBot.textContent = '⏳ Recalculando en Excel...';
+
+      const precios = Array.from(document.querySelectorAll('.admin-price-input')).map(input => ({
+        sku: input.dataset.sku,
+        precioVenta: Number(input.value) || 0
+      }));
+
+      const insumos = state.insumos.map(ins => {
+        const qtyInput = document.querySelector(`.admin-ins-qty[data-id="${ins.id}"]`);
+        const priceInput = document.querySelector(`.admin-ins-price[data-id="${ins.id}"]`);
+        return {
+          id: ins.id,
+          cantidadCompra: qtyInput ? Number(qtyInput.value) : ins.cantidadCompra,
+          precioCompra: priceInput ? Number(priceInput.value) : ins.precioCompra
+        };
+      });
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            accion: 'admin_guardar',
+            pin: state.adminPin,
+            precios,
+            insumos
+          })
+        });
+        const data = await res.json();
+
+        if (data && data.ok) {
+          guardarEstadoLocal(data);
+          renderCatalog();
+          renderAdminPanel();
+          renderMetrics();
+          showToast('✓ Excel actualizado: Costos y ganancias recalculados');
+        } else {
+          showToast('❌ ' + (data.error || 'Error al guardar'));
+        }
+      } catch (err) {
+        showToast('Error de red al guardar en Excel');
+      } finally {
+        btnTop.disabled = false;
+        btnBot.disabled = false;
+        btnTop.textContent = '💾 Guardar cambios y recalcular Excel';
+        btnBot.textContent = '💾 Guardar cambios y recalcular Excel';
+      }
+    }
+
+    document.getElementById('btnSaveAdminTop').addEventListener('click', guardarCambiosAdmin);
+    document.getElementById('btnSaveAdminBottom').addEventListener('click', guardarCambiosAdmin);
+
+    // =========================================================
+    // REGISTRO DE VENTAS Y COLA OFFLINE
+    // =========================================================
     async function registrarVenta() {
       const { totalUnidades, totalMonto, totalGanancia } = calcularTotalesCarrito();
       if (totalUnidades === 0 || state.cargando) return;
@@ -870,16 +1272,10 @@
         }
       }
 
-      const payload = {
-        accion: 'venta',
-        metodoPago: state.metodoPago,
-        items: items
-      };
-
+      const payload = { accion: 'venta', metodoPago: state.metodoPago, items };
       state.cargando = true;
       renderCheckoutBar();
 
-      // Actualización optimista inmediata en pantalla
       state.resumen.ventasHoyBruto = (state.resumen.ventasHoyBruto || 0) + totalMonto;
       state.resumen.gananciaHoyNeta = (state.resumen.gananciaHoyNeta || 0) + totalGanancia;
       state.resumen.unidadesHoy = (state.resumen.unidadesHoy || 0) + totalUnidades;
@@ -892,25 +1288,26 @@
       renderCatalog();
 
       try {
-        // text/plain evita el bloqueo CORS preflight (OPTIONS) en Google Apps Script
         const response = await fetch(API_URL, {
           method: 'POST',
           redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
-
         const result = await response.json();
         if (result && result.ok) {
           actualizarEstadoConexion(true);
           showToast(`✓ Venta anotada (${clpFormat.format(totalMonto)})`);
           sincronizarDesdeExcel(true);
         } else {
-          throw new Error(result.error || 'Respuesta inválida');
+          throw new Error(result.error || 'Error');
         }
       } catch (err) {
         actualizarEstadoConexion(false);
-        guardarEnColaOffline(payload);
+        const queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUEUE) || '[]');
+        queue.push(payload);
+        localStorage.setItem(STORAGE_KEYS.QUEUE, JSON.stringify(queue));
+        renderQueueBanner();
         showToast('Sin señal: Venta guardada en cola offline');
       } finally {
         state.cargando = false;
@@ -920,10 +1317,8 @@
 
     async function deshacerUltimaVenta() {
       if (!confirm('¿Borrar la última fila registrada en la pestaña Ventas del Excel?')) return;
-
       const btnUndo = document.getElementById('btnUndo');
       btnUndo.textContent = 'Borrando...';
-
       try {
         const response = await fetch(API_URL, {
           method: 'POST',
@@ -932,45 +1327,33 @@
           body: JSON.stringify({ accion: 'deshacer' })
         });
         const result = await response.json();
-
         if (result && result.ok) {
-          showToast('⌫ Última venta eliminada del Excel');
+          showToast('⌫ Última venta eliminada');
           await sincronizarDesdeExcel(true);
         } else {
           showToast(result.error || 'No se pudo borrar');
         }
       } catch (err) {
-        showToast('Necesitas conexión para deshacer en el Excel');
+        showToast('Necesitas conexión para deshacer');
       } finally {
-        btnUndo.textContent = '⌫ Deshacer última';
+        btnUndo.textContent = '⌫ Deshacer';
       }
     }
 
-    // =========================================================
-    // COLA OFFLINE (RESILIENCIA SURGICAL-BOT-OPS)
-    // =========================================================
-    function obtenerColaOffline() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.QUEUE)) || [];
-      } catch {
-        return [];
+    function renderQueueBanner() {
+      const queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUEUE) || '[]');
+      const banner = document.getElementById('queueBanner');
+      if (queue.length > 0) {
+        banner.classList.add('visible');
+        document.getElementById('queueText').textContent = `${queue.length} pendiente(s) de subir`;
+      } else {
+        banner.classList.remove('visible');
       }
     }
 
-    function guardarEnColaOffline(payload) {
-      const queue = obtenerColaOffline();
-      queue.push(payload);
-      localStorage.setItem(STORAGE_KEYS.QUEUE, JSON.stringify(queue));
-      renderQueueBanner();
-    }
-
-    async function VaciarColaOffline() {
-      const queue = obtenerColaOffline();
-      if (queue.length === 0) return;
-
-      const btnSync = document.getElementById('btnSyncQueue');
-      btnSync.textContent = 'Subiendo...';
-
+    async function vaciarColaOffline() {
+      const queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUEUE) || '[]');
+      if (!queue.length) return;
       const pendientes = [];
       for (const pedido of queue) {
         try {
@@ -986,50 +1369,32 @@
           pendientes.push(pedido);
         }
       }
-
       localStorage.setItem(STORAGE_KEYS.QUEUE, JSON.stringify(pendientes));
       renderQueueBanner();
-      btnSync.textContent = 'Subir ahora';
-
       if (pendientes.length === 0) {
-        actualizarEstadoConexion(true);
-        showToast('✓ Todas las ventas pendientes fueron subidas');
+        showToast('✓ Ventas pendientes subidas');
         sincronizarDesdeExcel(true);
-      } else {
-        showToast(`Quedaron ${pendientes.length} pendientes por señal`);
       }
     }
 
     function actualizarEstadoConexion(online) {
       const pill = document.getElementById('connStatus');
       const text = document.getElementById('connText');
-      if (online) {
-        pill.classList.remove('offline');
-        text.textContent = 'En línea';
-      } else {
-        pill.classList.add('offline');
-        text.textContent = 'Offline';
-      }
+      pill.classList.toggle('offline', !online);
+      text.textContent = online ? 'En línea' : 'Offline';
     }
 
-    // =========================================================
-    // EVENTOS TÁCTILES (DELEGACIÓN)
-    // =========================================================
+    // EVENTOS
     document.getElementById('catalogContainer').addEventListener('click', (e) => {
       const btn = e.target.closest('.step-btn');
       if (!btn) return;
-
       const sku = btn.dataset.sku;
-      const action = btn.dataset.action;
       const actual = state.carrito[sku] || 0;
-
-      if (action === 'plus') {
-        state.carrito[sku] = actual + 1;
-      } else if (action === 'minus' && actual > 0) {
+      if (btn.dataset.action === 'plus') state.carrito[sku] = actual + 1;
+      else if (btn.dataset.action === 'minus' && actual > 0) {
         state.carrito[sku] = actual - 1;
         if (state.carrito[sku] === 0) delete state.carrito[sku];
       }
-
       renderCatalog();
       renderCheckoutBar();
     });
@@ -1037,7 +1402,6 @@
     document.querySelector('.filter-bar').addEventListener('click', (e) => {
       const tab = e.target.closest('.tab-btn');
       if (!tab) return;
-
       document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       state.categoriaActiva = tab.dataset.cat;
@@ -1047,19 +1411,15 @@
     document.querySelector('.pay-toggle').addEventListener('click', (e) => {
       const opt = e.target.closest('.pay-opt');
       if (!opt) return;
-
       document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('active'));
       opt.classList.add('active');
       state.metodoPago = opt.dataset.pay;
-
-      document.getElementById('changeRow').style.display =
-        state.metodoPago === 'Efectivo' ? 'flex' : 'none';
+      document.getElementById('changeRow').style.display = state.metodoPago === 'Efectivo' ? 'flex' : 'none';
     });
 
     document.querySelector('.bill-chips').addEventListener('click', (e) => {
       const chip = e.target.closest('.bill-chip');
       if (!chip) return;
-
       const val = Number(chip.dataset.bill);
       if (state.billeteSeleccionado === val) {
         state.billeteSeleccionado = 0;
@@ -1083,10 +1443,9 @@
     document.getElementById('btnSubmit').addEventListener('click', registrarVenta);
     document.getElementById('btnRefresh').addEventListener('click', () => sincronizarDesdeExcel(false));
     document.getElementById('btnUndo').addEventListener('click', deshacerUltimaVenta);
-    document.getElementById('btnSyncQueue').addEventListener('click', VaciarColaOffline);
-    window.addEventListener('online', VaciarColaOffline);
+    document.getElementById('btnSyncQueue').addEventListener('click', vaciarColaOffline);
+    window.addEventListener('online', vaciarColaOffline);
 
-    // Inicialización inmediata
     renderMetrics();
     renderCatalog();
     renderCheckoutBar();
